@@ -65,7 +65,7 @@ class shader:
         glUniform2fv(glGetUniformLocation(self.program, name), 1, object)
 
     def set_vec2_f(self, name, x, y):
-        glUniform2f(glGetuniformLocation(self.program, name), x, y)
+        glUniform2f(glGetUniformLocation(self.program, name), x, y)
 
     def set_vec3_o(self, name, object):
         glUniform3fv(glGetUniformLocation(self.program, name), 1, object)

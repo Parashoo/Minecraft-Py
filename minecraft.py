@@ -128,13 +128,9 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    texture0 = texture_utils.texture('ressources/container.jpg', False)
+    texture0 = texture_utils.texture('ressources/cobblestone.png', False)
     texture0.source_open()
     texture0_ID = texture0.gen_texture()
-
-    texture1 = texture_utils.texture('ressources/awesomeface.png', True)
-    texture1.source_open()
-    texture1_ID = texture1.gen_texture()
 
     crosshair_texture = texture_utils.texture('ressources/icons.png', False)
     crosshair_texture.source_open_zone((0, 0, 16, 16))
@@ -142,7 +138,6 @@ def main():
 
     shader_program.use()
     shader_program.set_int('texture0', 0)
-    shader_program.set_int('texture1', 1)
 
     shader_program_2d.use()
     shader_program_2d.set_int('texture0', 0)
@@ -167,8 +162,6 @@ def main():
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, texture0_ID)
-        glActiveTexture(GL_TEXTURE1)
-        glBindTexture(GL_TEXTURE_2D, texture1_ID)
 
         shader_program.use()
 
