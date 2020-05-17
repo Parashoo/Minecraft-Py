@@ -3,7 +3,7 @@ import glm
 import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
-from packages import shader_utils, window_utils, texture_utils, camera_utils
+from packages import utilities
 
 vertex_source_3d = 'shaders/scene.vs'
 fragment_source_3d = 'shaders/scene.fs'
@@ -11,7 +11,7 @@ fragment_source_3d = 'shaders/scene.fs'
 vertex_source_GUI = 'shaders/hud.vs'
 fragment_source_GUI = 'shaders/hud.fs'
 
-camera = camera_utils.camera((0, 0, -3), (0, 0, 1), (800, 600))
+camera = utilities.camera((0, 0, -3), (0, 0, 1), (800, 600))
 
 last_x, last_y = 400, 300
 yaw, pitch = -90, 0
@@ -23,7 +23,7 @@ last_frame = 0.0
 def main():
     global delta_time, last_frame
 
-    window = window_utils.window()
+    window = utilities.window()
     camera.setup_window(window)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_BLEND)
@@ -93,10 +93,10 @@ def main():
       glm.vec3(-1.3, 1.0, -1.5)
       ]
 
-    shader_program = shader_utils.shader(vertex_source_3d, fragment_source_3d, '330')
+    shader_program = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
     shader_program.compile()
 
-    shader_program_2d = shader_utils.shader(vertex_source_GUI, fragment_source_GUI, '330')
+    shader_program_2d = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
     shader_program_2d.compile()
 
     vbo, vao, ebo = glGenBuffers(1), glGenVertexArrays(1), glGenBuffers(1)
@@ -128,11 +128,11 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    texture0 = texture_utils.texture('ressources/cobblestone.png', False)
+    texture0 = utilities.texture('ressources/cobblestone.png', False)
     texture0.source_open()
     texture0_ID = texture0.gen_texture()
 
-    crosshair_texture = texture_utils.texture('ressources/icons.png', False)
+    crosshair_texture = utilities.texture('ressources/icons.png', False)
     crosshair_texture.source_open_zone((0, 0, 16, 16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
