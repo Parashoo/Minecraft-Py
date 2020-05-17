@@ -170,7 +170,8 @@ class texture:
         try:
             self.tex_file = Image.open(self.source)
         except FileNotFoundError:
-            print('[TEXTURE ERROR]: Given file does not exist')
+            print('\033[1m\033[91m[TEXTURE ERROR]: Given file does not exist\033[0m\n')
+            self.tex_file = Image.open('ressources/missing.png')
         if self.flip:
             self.tex_file = self.tex_file.rotate(180)
 
