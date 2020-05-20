@@ -4,6 +4,7 @@ import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
 from packages import utilities
+from packages import chunk
 
 vertex_source_3d = 'shaders/scene.vs'
 fragment_source_3d = 'shaders/scene.fs'
@@ -21,8 +22,12 @@ delta_time = 0.0
 last_frame = 0.0
 
 def main():
+
     global delta_time, last_frame
 
+    test_chunk = chunk.chunk((0,0,0))
+    test_chunk.fill_layers(0, 16, 1)
+    
     window = utilities.window()
     camera.setup_window(window)
     glEnable(GL_DEPTH_TEST)
@@ -33,7 +38,6 @@ def main():
 
     vertices = np.array([
        #bacc face
-        
        0.0,  0.0,  0.0,  1.0, 1.0,
        1.0,  0.0,  0.0,  0.0, 1.0,
        1.0,  1.0,  0.0,  0.0, 0.0,
@@ -42,7 +46,6 @@ def main():
        0.0,  0.0,  0.0,  1.0, 1.0,
 
        #front face
-    
        0.0,  0.0,  1.0,  1.0, 1.0,
        1.0,  0.0,  1.0,  0.0, 1.0,
        1.0,  1.0,  1.0,  0.0, 0.0,
@@ -51,7 +54,6 @@ def main():
        0.0,  0.0,  1.0,  1.0, 1.0,
 
        #left face
-        
        0.0,  1.0,  1.0,  1.0, 0.0,
        0.0,  1.0,  0.0,  0.0, 0.0,
        0.0,  0.0,  0.0,  0.0, 1.0,
@@ -60,7 +62,6 @@ def main():
        0.0,  1.0,  1.0,  1.0, 0.0,
 
        #right face
-        
        1.0,  1.0,  1.0,  1.0, 0.0,
        1.0,  1.0,  0.0,  0.0, 0.0,
        1.0,  0.0,  0.0,  0.0, 1.0,
@@ -83,37 +84,16 @@ def main():
        0.0,  1.0, 0.0,  0.0, 1.0
        ], dtype='float32')
 
-    indexes = np.array([
-      0, 1, 3,
-      1, 2, 3
-      ], dtype='int32')
-
-    cube_offsets = [
-      glm.vec3( 0.0, 0.0, 0.0),
-      glm.vec3( 2.0, 5.0,-15.0),
-      glm.vec3(-1.5,-2.2,-2.5),
-      glm.vec3(-3.8,-2.9,-12.3),
-      glm.vec3( 2.4,-0.4,-3.5),
-      glm.vec3(-1.7, 3.0,-7.5),
-      glm.vec3( 1.3,-2.0, -2.5),
-      glm.vec3( 1.5, 2.0, -2.5),
-      glm.vec3( 1.5, 0.2, -1.5),
-      glm.vec3(-1.3, 1.0, -1.5)
-      ]
-
     shader_program = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
     shader_program.compile()
 
     shader_program_2d = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
     shader_program_2d.compile()
 
-    vbo, vao, ebo = glGenBuffers(1), glGenVertexArrays(1), glGenBuffers(1)
-
+    vbo, vao = glGenBuffers(1), glGenVertexArrays(1)
     glBindVertexArray(vao)
     glBindBuffer(GL_ARRAY_BUFFER, vbo)
     glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes, GL_STATIC_DRAW)
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
     glEnableVertexAttribArray(0)
@@ -136,9 +116,9 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    texture0 = utilities.texture('ressources/birch_log.png', False)
-    texture0.source_open()
-    texture0_ID = texture0.gen_texture()
+    cobble_tex = utilities.texture('ressources/cobblestone.png', False)
+    cobble_tex.source_open()
+    cobble_tex_ID = cobble_tex.gen_texture()
 
     crosshair_texture = utilities.texture('ressources/icons.png', False)
     crosshair_texture.source_open_zone((0, 0, 16, 16))
@@ -169,7 +149,6 @@ def main():
         camera.testing_commands(window)
 
         glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, texture0_ID)
 
         shader_program.use()
 
@@ -182,12 +161,13 @@ def main():
 
         glBindVertexArray(vao)
 
-        for i, offset in enumerate(cube_offsets):
-
-            model = glm.mat4(1.0)
-            model = glm.translate(model, offset)
-            shader_program.set_mat4('model', glm.value_ptr(model))
-            glDrawArrays(GL_TRIANGLES, 0, 36)
+        for i, blocktype in np.ndenumerate(test_chunk.data):
+            if blocktype == 1 and test_chunk.return_if_exposed(i):
+                glBindTexture(GL_TEXTURE_2D, cobble_tex_ID)
+                model = glm.mat4(1.0)
+                model = glm.translate(model, glm.vec3(i))
+                shader_program.set_mat4('model', glm.value_ptr(model))
+                glDrawArrays(GL_TRIANGLES, 0, 36)
 
         glBindVertexArray(0)
 
