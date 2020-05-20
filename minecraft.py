@@ -27,7 +27,7 @@ def main():
 
     test_chunk = chunk.chunk((0,0,0))
     test_chunk.fill_layers(0, 16, 1)
-    
+
     window = utilities.window()
     camera.setup_window(window)
     glEnable(GL_DEPTH_TEST)
@@ -124,6 +124,8 @@ def main():
     crosshair_texture.source_open_zone((0, 0, 16, 16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
+    render_list = [i for i, blocktype in np.ndenumerate(test_chunk.data) if test_chunk.return_if_exposed(i) == True and blocktype != 0]
+
     shader_program.use()
     shader_program.set_int('texture0', 0)
 
@@ -143,6 +145,8 @@ def main():
         second_counter += delta_time
         frame_counter += 1
 
+        glBindTexture(GL_TEXTURE_2D, cobble_tex_ID)
+
         window.refresh(0)
 
         camera.process_input(window, delta_time)
@@ -161,13 +165,11 @@ def main():
 
         glBindVertexArray(vao)
 
-        for i, blocktype in np.ndenumerate(test_chunk.data):
-            if blocktype == 1 and test_chunk.return_if_exposed(i):
-                glBindTexture(GL_TEXTURE_2D, cobble_tex_ID)
-                model = glm.mat4(1.0)
-                model = glm.translate(model, glm.vec3(i))
-                shader_program.set_mat4('model', glm.value_ptr(model))
-                glDrawArrays(GL_TRIANGLES, 0, 36)
+        for block in render_list:
+            model = glm.mat4(1.0)
+            model = glm.translate(model, glm.vec3(block))
+            shader_program.set_mat4('model', glm.value_ptr(model))
+            glDrawArrays(GL_TRIANGLES, 0, 36)
 
         glBindVertexArray(0)
 

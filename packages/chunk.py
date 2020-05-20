@@ -12,7 +12,7 @@ class chunk:
     def return_if_exposed(self, chunk_coords):
         exposed = True
         x, y, z = chunk_coords
-        if not (x == 0 or x == 15 or z == 0 or z == 15):
+        if not (x == 0 or x == 15 or z == 0 or z == 15 or y == 0 or y == 255):
             neighbours = (self.data[x+1,y,z],
                           self.data[x-1,y,z],
                           self.data[x,y+1,z],
