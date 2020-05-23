@@ -26,7 +26,7 @@ def main():
     global delta_time, last_frame
 
     test_chunk = chunk.chunk((0,0,0))
-    test_chunk.fill_layers(0, 16, 1)
+    test_chunk.fill_layers(0, 256, 1)
 
     window = utilities.window()
     camera.setup_window(window)
@@ -78,7 +78,7 @@ def main():
     second_counter = 0
     frame_counter = 0
 
-    chunk_render = render.render([(0,0,0),(1,0,1),(2,1,0)])
+    chunk_render = render.render(exposed_list)
     chunk_render.create_buffers()
 
     while not window.check_if_closed():
