@@ -4,7 +4,7 @@ import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
 from packages import utilities
-from packages import chunk, render
+from packages import chunk
 
 vertex_source_3d = 'shaders/scene.vs'
 fragment_source_3d = 'shaders/scene.fs'
@@ -36,11 +36,70 @@ def main():
     crosshair = np.array([
       0.0, 0.0, 0.0], dtype = 'float32')
 
+    vertices = np.array([
+       #bacc face
+       0.0,  0.0,  0.0,  1.0, 1.0,
+       1.0,  0.0,  0.0,  0.0, 1.0,
+       1.0,  1.0,  0.0,  0.0, 0.0,
+       1.0,  1.0,  0.0,  0.0, 0.0,
+       0.0,  1.0,  0.0,  1.0, 0.0,
+       0.0,  0.0,  0.0,  1.0, 1.0,
+
+       #front face
+       0.0,  0.0,  1.0,  1.0, 1.0,
+       1.0,  0.0,  1.0,  0.0, 1.0,
+       1.0,  1.0,  1.0,  0.0, 0.0,
+       1.0,  1.0,  1.0,  0.0, 0.0,
+       0.0,  1.0,  1.0,  1.0, 0.0,
+       0.0,  0.0,  1.0,  1.0, 1.0,
+
+       #left face
+       0.0,  1.0,  1.0,  1.0, 0.0,
+       0.0,  1.0,  0.0,  0.0, 0.0,
+       0.0,  0.0,  0.0,  0.0, 1.0,
+       0.0,  0.0,  0.0,  0.0, 1.0,
+       0.0,  0.0,  1.0,  1.0, 1.0,
+       0.0,  1.0,  1.0,  1.0, 0.0,
+
+       #right face
+       1.0,  1.0,  1.0,  1.0, 0.0,
+       1.0,  1.0,  0.0,  0.0, 0.0,
+       1.0,  0.0,  0.0,  0.0, 1.0,
+       1.0,  0.0,  0.0,  0.0, 1.0,
+       1.0,  0.0,  1.0,  1.0, 1.0,
+       1.0,  1.0,  1.0,  1.0, 0.0,
+
+       0.0, 0.0, 0.0,  0.0, 1.0,
+       1.0, 0.0, 0.0,  1.0, 1.0,
+       1.0, 0.0, 1.0,  1.0, 0.0,
+       1.0, 0.0, 1.0,  1.0, 0.0,
+       0.0, 0.0, 1.0,  0.0, 0.0,
+       0.0, 0.0, 0.0,  0.0, 1.0,
+
+       0.0,  1.0, 0.0,  0.0, 1.0,
+       1.0,  1.0, 0.0,  1.0, 1.0,
+       1.0,  1.0, 1.0,  1.0, 0.0,
+       1.0,  1.0, 1.0,  1.0, 0.0,
+       0.0,  1.0, 1.0,  0.0, 0.0,
+       0.0,  1.0, 0.0,  0.0, 1.0
+       ], dtype='float32')
+
     shader_program = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
     shader_program.compile()
 
     shader_program_2d = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
     shader_program_2d.compile()
+
+    vbo, vao = glGenBuffers(1), glGenVertexArrays(1)
+    glBindVertexArray(vao)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo)
+    glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
+    glEnableVertexAttribArray(0)
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
+    glEnableVertexAttribArray(1)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0)
     glBindVertexArray(0)
@@ -51,7 +110,7 @@ def main():
     glBindBuffer(GL_ARRAY_BUFFER, vbo_2d)
     glBufferData(GL_ARRAY_BUFFER, crosshair, GL_STATIC_DRAW)
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
     glEnableVertexAttribArray(0)
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
@@ -65,7 +124,7 @@ def main():
     crosshair_texture.source_open_zone((0, 0, 16, 16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
-    exposed_list = [i for i, blocktype in np.ndenumerate(test_chunk.data) if test_chunk.return_if_exposed(i) == True and blocktype != 0]
+    render_list = [i for i, blocktype in np.ndenumerate(test_chunk.data) if test_chunk.return_if_exposed(i) == True and blocktype != 0]
 
     shader_program.use()
     shader_program.set_int('texture0', 0)
@@ -78,9 +137,6 @@ def main():
     second_counter = 0
     frame_counter = 0
 
-    chunk_render = render.render([(0,0,0),(1,0,1),(2,1,0)])
-    chunk_render.create_buffers()
-
     while not window.check_if_closed():
 
         current_frame = glfw.get_time()
@@ -88,6 +144,8 @@ def main():
         last_frame = current_frame
         second_counter += delta_time
         frame_counter += 1
+
+        glBindTexture(GL_TEXTURE_2D, cobble_tex_ID)
 
         window.refresh(0)
 
@@ -98,24 +156,27 @@ def main():
 
         shader_program.use()
 
-
         pos, looking, up = camera.return_vectors()
         view = glm.lookAt(pos, looking, up)
         projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 100)
+
         shader_program.set_mat4('view', glm.value_ptr(view))
         shader_program.set_mat4('projection', glm.value_ptr(projection))
 
-        chunk_render.draw_buffer(shader_program, cobble_tex_ID)
+        glBindVertexArray(vao)
+
+        for block in render_list:
+            model = glm.mat4(1.0)
+            model = glm.translate(model, glm.vec3(block))
+            shader_program.set_mat4('model', glm.value_ptr(model))
+            glDrawArrays(GL_TRIANGLES, 0, 36)
 
         glBindVertexArray(0)
-
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, crosshair_texture_ID)
 
         shader_program_2d.use()
-
-
         glBindVertexArray(vao_2d)
         glPointSize(32)
         glDrawArrays(GL_POINTS, 0, 1)
@@ -125,6 +186,9 @@ def main():
             second_counter, frame_counter = 0, 0
 
         window.refresh(1)
+
+    glDeleteVertexArrays(1, vao)
+    glDeleteBuffers(1, vbo)
 
     window.close()
 
