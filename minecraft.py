@@ -4,7 +4,7 @@ import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
 from packages import utilities
-from packages import chunk, render
+from packages import chunk, render, world_gen
 
 vertex_source_3d = 'shaders/scene.vs'
 fragment_source_3d = 'shaders/scene.fs'
@@ -12,7 +12,7 @@ fragment_source_3d = 'shaders/scene.fs'
 vertex_source_GUI = 'shaders/hud.vs'
 fragment_source_GUI = 'shaders/hud.fs'
 
-camera = utilities.camera((0, 0, -3), (0, 0, 1), (800, 600))
+camera = utilities.camera((0, 16, 0), (0, 0, 0), (800, 600))
 
 last_x, last_y = 400, 300
 yaw, pitch = -90, 0
@@ -25,9 +25,7 @@ def main():
 
     global delta_time, last_frame
 
-    test_chunk = chunk.chunk((0,0,0))
-    test_chunk.fill_layers(0, 256, 1)
-
+    test_world = world_gen.world('__DELETEME__')
     window = utilities.window()
     camera.setup_window(window)
     glEnable(GL_DEPTH_TEST)
@@ -65,7 +63,7 @@ def main():
     crosshair_texture.source_open_zone((0, 0, 16, 16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
-    exposed_list = [i for i, blocktype in np.ndenumerate(test_chunk.data) if test_chunk.return_if_exposed(i) == True and blocktype != 0]
+    exposed_list = test_world.return_all_exposed()
 
     shader_program.use()
     shader_program.set_int('texture0', 0)
@@ -124,6 +122,8 @@ def main():
             print(frame_counter)
             second_counter, frame_counter = 0, 0
 
+        print(camera.pos)
+            
         window.refresh(1)
 
     window.close()

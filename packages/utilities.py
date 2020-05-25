@@ -54,7 +54,7 @@ class camera:
         self.move.z = direction.z / glm.cos(glm.radians(self.pitch))
 
     def process_input(self, parent, time):
-        camera_speed = [4.13 * time, 4.13 * time]
+        camera_speed = [4.13 * time, 5 * time]
 
         if glfw.get_key(parent.window, glfw.KEY_W) == glfw.PRESS:
             self.pos += camera_speed[0] * self.move
@@ -72,6 +72,10 @@ class camera:
     def testing_commands(self, parent):
         if glfw.get_key(parent.window, glfw.KEY_H) == glfw.PRESS:
             self.pos = glm.vec3(0, 0, -3)
+        if glfw.get_key(parent.window, glfw.KEY_PAGE_DOWN) == glfw.PRESS:
+            self.pos.y -= 50
+        if glfw.get_key(parent.window, glfw.KEY_PAGE_UP) == glfw.PRESS:
+            self.pos.y += 50
 
     def return_vectors(self):
         return self.pos, self.pos + self.front, self.up
