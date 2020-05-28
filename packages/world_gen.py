@@ -67,7 +67,6 @@ class world:
                 try:
                     neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[neighbour_lines[direction]]][:-1]))
                 except KeyError:
-                    print('\033[91m\033[01mEdge Chunk!\033[00m')
                     neighbours.append(np.zeros((16, 256, 16), dtype = 'uint8'))
             target = chunk.chunk()
             target.from_bytes(self.world_lines[line][:-1])
@@ -78,5 +77,5 @@ class world:
         return exposed_blocks
 
     def return_time(self):
-        return '\033[94mWorld file creation: {}\nExposed block calculation: {}\033[00m'.format(self.time_required[0], self.time_required[1])
+        return 'Exposed block calculation: {}'.format(self.time_required[0], self.time_required[1])
 

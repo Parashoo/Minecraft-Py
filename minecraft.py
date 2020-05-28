@@ -126,8 +126,8 @@ def main():
         window.refresh(1)
 
     window.close()
-    print('===== End statistics =====\n')
-    print('\033[92mAverage FPS: {}\033[00m\n'.format(np.mean(fps_list)))
+    print('\n===== End statistics =====')
+    print('Average FPS: {}'.format(np.mean(fps_list)))
     print(test_world.return_time())
 
 if __name__ == '__main__':
