@@ -1,15 +1,16 @@
 import numpy as np
 from math import floor
 from packages import chunk
+from time import time
 
 class world:
     def __init__(self, worldname):
 
+        now = time()
         self.chunk_dict = {}
         self.wname = 'world/'+worldname+'.world'
         world_file = open(self.wname, 'wb')
         line_counter = 0
-        
         for index, stuff in np.ndenumerate(np.zeros((8, 8))):
             index_x, index_z = index[0] - 4, index[1] - 4
             coords_string = str([index_x, index_z])
@@ -18,11 +19,14 @@ class world:
             world_file.write(new_chunk.data.tostring()+'\n'.encode('utf-8'))
             self.chunk_dict[coords_string] = line_counter
             line_counter += 1
-            
+
         world_file.close()
-        
+
         with open(self.wname, 'r') as wdata:
             self.world_lines = wdata.readlines()
+
+        elapsed = time() - now
+        self.time_required = [elapsed]
 
     def get_block(self, x, y, z):
         target_chunk = chunk.chunk()
@@ -31,7 +35,6 @@ class world:
 
         wline = self.chunk_dict[str(chunk_coords)]
         chunk_data = self.world_lines[wline][:-1]
-        
         target_chunk.from_bytes(chunk_data)
 
         return target_chunk.data[tuple(coords_in_chunk)]
@@ -51,11 +54,30 @@ class world:
             file.writelines(self.worldlines)
 
     def return_all_exposed(self):
+        now = time()
         exposed_blocks = []
-        for chunk_corner, line in self.chunk_dict.items():
+        for chunk_corner_string, line in self.chunk_dict.items():
+            chunk_corner = eval(chunk_corner_string)
+            neighbour_lines = {
+                    'north': str([chunk_corner[0], chunk_corner[1]+1]),
+                    'south': str([chunk_corner[0], chunk_corner[1]-1]),
+                    'east': str([chunk_corner[0]+1, chunk_corner[1]]),
+                    'west': str([chunk_corner[0]-1, chunk_corner[1]])}
+            neighbours = []
+            for direction in neighbour_lines:
+                try:
+                    neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[neighbour_lines[direction]]][:-1]))
+                except KeyError:
+                    print('\033[91m\033[01mEdge Chunk!\033[00m')
+                    neighbours.append(np.zeros((16, 256, 16), dtype = 'uint8'))
             target = chunk.chunk()
             target.from_bytes(self.world_lines[line][:-1])
-            exposed_blocks = exposed_blocks + target.return_exposed(eval(chunk_corner))
-        print(len(exposed_blocks))
-        input('Generate render buffer? ')
+            exposed_blocks = exposed_blocks + target.return_exposed(chunk_corner, neighbours)
+        elapsed = time() - now
+
+        self.time_required.append(elapsed)
         return exposed_blocks
+
+    def return_time(self):
+        return '\033[94mWorld file creation: {}\nExposed block calculation: {}\033[00m'.format(self.time_required[0], self.time_required[1])
+

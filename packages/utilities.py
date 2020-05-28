@@ -76,6 +76,9 @@ class camera:
             self.pos.y -= 50
         if glfw.get_key(parent.window, glfw.KEY_PAGE_UP) == glfw.PRESS:
             self.pos.y += 50
+        if glfw.get_key(parent.window, glfw.KEY_C) == glfw.PRESS:
+            nice_coords = [int(i) for i in self.pos]
+            print('x: {} y: {} z: {}'.format(nice_coords[0], nice_coords[1], nice_coords[2]))
 
     def return_vectors(self):
         return self.pos, self.pos + self.front, self.up

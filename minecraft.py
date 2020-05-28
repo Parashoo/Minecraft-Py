@@ -25,6 +25,8 @@ def main():
 
     global delta_time, last_frame
 
+    fps_list = []
+
     test_world = world_gen.world('__DELETEME__')
     window = utilities.window()
     camera.setup_window(window)
@@ -119,14 +121,14 @@ def main():
         glDrawArrays(GL_POINTS, 0, 1)
 
         if second_counter >= 1:
-            print(frame_counter)
+            fps_list.append(frame_counter)
             second_counter, frame_counter = 0, 0
-
-        print(camera.pos)
-            
         window.refresh(1)
 
     window.close()
+    print('===== End statistics =====\n')
+    print('\033[92mAverage FPS: {}\033[00m\n'.format(np.mean(fps_list)))
+    print(test_world.return_time())
 
 if __name__ == '__main__':
     main()

@@ -6,7 +6,6 @@ class render:
     def __init__(self, coords_list):
         self.render_list = []
         for i in coords_list:
-            print(i)
             self.render_list.append([
                 0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2],
                 1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2],
@@ -50,7 +49,6 @@ class render:
                 0.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2],
                 0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2],
             ])
-            print('Cube added!')
 
     def create_buffers(self):
         render_vbo, self.render_vao = glGenBuffers(1), glGenVertexArrays(1)
