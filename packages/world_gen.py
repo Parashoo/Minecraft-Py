@@ -13,11 +13,11 @@ class world:
         line_counter = 0
         for index, stuff in np.ndenumerate(np.zeros((8, 8))):
             index_x, index_z = index[0] - 4, index[1] - 4
-            coords_string = str([index_x, index_z])
+            coords_list = (index_x, index_z)
             new_chunk = chunk.chunk()
             new_chunk.fill_layers(0, 16, 5)
             world_file.write(new_chunk.data.tostring()+'\n'.encode('utf-8'))
-            self.chunk_dict[coords_string] = line_counter
+            self.chunk_dict[coords_list] = line_counter
             line_counter += 1
 
         world_file.close()
@@ -56,13 +56,12 @@ class world:
     def return_all_exposed(self):
         now = time()
         exposed_blocks = []
-        for chunk_corner_string, line in self.chunk_dict.items():
-            chunk_corner = eval(chunk_corner_string)
+        for chunk_corner, line in self.chunk_dict.items():
             neighbour_lines = {
-                    'north': str([chunk_corner[0], chunk_corner[1]+1]),
-                    'south': str([chunk_corner[0], chunk_corner[1]-1]),
-                    'east': str([chunk_corner[0]+1, chunk_corner[1]]),
-                    'west': str([chunk_corner[0]-1, chunk_corner[1]])}
+                    'north': (chunk_corner[0], chunk_corner[1]+1),
+                    'south': (chunk_corner[0], chunk_corner[1]-1),
+                    'east': (chunk_corner[0]+1, chunk_corner[1]),
+                    'west': (chunk_corner[0]-1, chunk_corner[1])}
             neighbours = []
             for direction in neighbour_lines:
                 try:
