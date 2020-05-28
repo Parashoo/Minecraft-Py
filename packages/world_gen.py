@@ -77,5 +77,5 @@ class world:
         return exposed_blocks
 
     def return_time(self):
-        return 'Exposed block calculation: {}'.format(self.time_required[0], self.time_required[1])
+        return 'Exposed block calculation: {}'.format(self.time_required[1])
 
