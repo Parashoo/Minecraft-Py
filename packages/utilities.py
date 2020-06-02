@@ -88,7 +88,7 @@ class camera:
         if glfw.get_key(parent.window, glfw.KEY_PAGE_UP) == glfw.PRESS:
             self.pos.y += 50
         if glfw.get_key(parent.window, glfw.KEY_C) == glfw.PRESS:
-            if not self.coords_toggle:                
+            if not self.coords_toggle:
                 nice_coords = [int(i) for i in self.pos]
                 print('x: {} y: {} z: {}'.format(nice_coords[0], nice_coords[1], nice_coords[2]))
                 self.coords_toggle = True
@@ -280,7 +280,7 @@ class window:
         if options:
             color = options[0]
         if step == 0:
-            glClearColor(color[0], color[1], color[2], color[3])
+            #glClearColor(color[0], color[1], color[2], color[3])
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         if step == 1:
             glfw.swap_buffers(self.window)
