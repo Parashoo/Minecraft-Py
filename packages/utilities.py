@@ -44,10 +44,10 @@ class camera:
         self.yaw += x_offset
         self.pitch -= y_offset
 
-        if self.pitch > 89:
-            self.pitch = 89
-        if self.pitch < -89:
-            self.pitch = -89
+        if self.pitch > 89.95:
+            self.pitch = 89.95
+        if self.pitch < -89.95:
+            self.pitch = -89.95
 
         direction = glm.vec3(
           glm.cos(glm.radians(self.yaw)) * glm.cos(glm.radians(self.pitch)),
@@ -109,6 +109,9 @@ class camera:
                 self.direction_toggle = True
         if glfw.get_key(parent.window, glfw.KEY_F) == glfw.RELEASE:
             self.direction_toggle = False
+        if glfw.get_key(parent.window, glfw.KEY_O) == glfw.PRESS:
+            print('ASDFGHJKLÖ')
+            print(self.pitch)
     def return_vectors(self):
         return self.pos, self.pos + self.front, self.up
 

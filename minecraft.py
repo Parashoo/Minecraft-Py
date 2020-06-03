@@ -107,7 +107,7 @@ def main():
         window.refresh(0)
 
         shader_program_sky.use()
-        shader_program_sky.set_float('orientation', glm.radians(camera.yaw))
+        shader_program_sky.set_float('orientation', glm.radians(camera.pitch))
         glDisable(GL_DEPTH_TEST)
         glBindVertexArray(sky_vao)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
