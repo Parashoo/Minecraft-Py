@@ -26,7 +26,7 @@ def main():
 
     fps_list = []
 
-    test_world = world_gen.world('__DELETEME__')
+    test_world = world_gen.world('__DELETEME__', '-o')
     window = utilities.window()
     camera.setup_window(window)
     glEnable(GL_DEPTH_TEST)

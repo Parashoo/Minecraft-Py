@@ -1,29 +1,38 @@
 import numpy as np
+import os.path
+from json import dumps, loads
 from math import floor
 from packages import chunk
 from time import time
 
 class world:
-    def __init__(self, worldname):
+    def __init__(self, worldname, *argv):
 
         now = time()
-        self.chunk_dict = {}
+        self.world_mode = 'Loading existing world: '
         self.wname = 'world/'+worldname+'.world'
-        world_file = open(self.wname, 'wb')
-        line_counter = 0
-        for index, stuff in np.ndenumerate(np.zeros((8, 8))):
-            index_x, index_z = index[0] - 4, index[1] - 4
-            coords_list = (index_x, index_z)
-            new_chunk = chunk.chunk()
-            new_chunk.fill_layers(0, 16, 5)
-            world_file.write(new_chunk.data.tostring()+'\n'.encode('utf-8'))
-            self.chunk_dict[coords_list] = line_counter
-            line_counter += 1
-
-        world_file.close()
+        if not (os.path.isfile('world/{}.world'.format(worldname) or argv[0] == '-o')):
+            self.world_mode = 'Creating new world: '
+            chunk_dict = {}
+            world_file = open(self.wname, 'wb')
+            writelines_list = []
+            line_counter = 0
+            for index, stuff in np.ndenumerate(np.zeros((8, 8))):
+                index_x, index_z = index[0] - 4, index[1] - 4
+                coords_list = (index_x, index_z)
+                new_chunk = chunk.chunk()
+                new_chunk.fill_layers(0, index[0] + index[1], 5)
+                writelines_list.append(new_chunk.data.tostring()+'\n'.encode('utf-8'))
+                chunk_dict[str(coords_list)] = line_counter
+                line_counter += 1
+            writelines_list = [(dumps(chunk_dict)+'\n').encode('utf-8')] + writelines_list
+            world_file.writelines(writelines_list)
+            world_file.close()
 
         with open(self.wname, 'r') as wdata:
-            self.world_lines = wdata.readlines()
+            wlines = wdata.readlines()
+            self.chunk_dict = loads(wlines[0])
+            self.world_lines = wlines[1:]
 
         elapsed = time() - now
         self.time_required = [elapsed]
@@ -56,7 +65,8 @@ class world:
     def return_all_exposed(self):
         now = time()
         exposed_blocks = []
-        for chunk_corner, line in self.chunk_dict.items():
+        for chunk_corner_str, line in self.chunk_dict.items():
+            chunk_corner = eval(chunk_corner_str)
             neighbour_lines = {
                     'north': (chunk_corner[0], chunk_corner[1]+1),
                     'south': (chunk_corner[0], chunk_corner[1]-1),
@@ -65,7 +75,7 @@ class world:
             neighbours = []
             for direction in neighbour_lines:
                 try:
-                    neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[neighbour_lines[direction]]][:-1]))
+                    neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[str(neighbour_lines[direction])]][:-1]))
                 except KeyError:
                     neighbours.append(np.zeros((16, 256, 16), dtype = 'uint8'))
             target = chunk.chunk()
@@ -77,5 +87,5 @@ class world:
         return exposed_blocks
 
     def return_time(self):
-        return 'Exposed block calculation: {}'.format(self.time_required[1])
+        return 'Exposed block calculation: {}\n{}{}'.format(self.time_required[1], self.world_mode, self.time_required[0])
 
