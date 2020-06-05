@@ -1,3 +1,6 @@
 **/__pycache__/
 **/world
+*.world
+*.save
+*.pyc
 README.md
