@@ -112,7 +112,6 @@ def main():
         glBindVertexArray(sky_vao)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
-                
         camera.process_input(window, delta_time)
         camera.testing_commands(window)
 
@@ -150,7 +149,7 @@ def main():
     window.close()
     print('\n===== End statistics =====')
     print('Average FPS: {}'.format(np.mean(fps_list)))
-    print(test_world.return_time())
+    print(test_world.return_time(),'\n')
 
 if __name__ == '__main__':
     main()
