@@ -73,12 +73,10 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    cobble_tex = utilities.texture('ressources/cobblestone.png', False)
-    cobble_tex.source_open()
+    cobble_tex = utilities.texture('ressources/cobblestone.png')
     cobble_tex_ID = cobble_tex.gen_texture()
 
-    crosshair_texture = utilities.texture('ressources/icons.png', False)
-    crosshair_texture.source_open_zone((0, 0, 16, 16))
+    crosshair_texture = utilities.texture('ressources/icons.png', crop = (0,0,16,16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
     exposed_list = test_world.return_all_exposed()

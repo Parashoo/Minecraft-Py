@@ -201,23 +201,17 @@ class shader:
         glUniformMatrix4fv(glGetUniformLocation(self.program, name), 1, GL_FALSE, object)
 
 class texture:
-    def __init__(self, source, flip):
+    def __init__(self, source, **kwargs):
         self.source = source
-        self.flip = flip
-
-    def source_open(self):
         try:
             self.tex_file = Image.open(self.source)
         except FileNotFoundError:
             print('\033[1m\033[91m[TEXTURE ERROR]: Given file does not exist\033[0m\n')
             self.tex_file = Image.open('ressources/missing.png')
-        if self.flip:
+        if 'flip' in kwargs.keys():
             self.tex_file = self.tex_file.rotate(180)
-
-    def source_open_zone(self, zone):
-        self.tex_file = Image.open(self.source).crop(zone)
-        if self.flip:
-            self.tex_file = self.tex_file.rotate(180)
+        if 'crop' in kwargs.keys():
+            self.tex_file = self.tex_file.crop(kwargs['crop'])
 
     def gen_texture(self):
         self.tex_ID = glGenTextures(1)
