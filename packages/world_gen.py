@@ -6,12 +6,12 @@ from packages import chunk
 from time import time
 
 class world:
-    def __init__(self, worldname, *argv):
+    def __init__(self, worldname, path, *options):
 
         now = time()
         self.world_mode = 'Loading existing world: '
-        self.wname = 'world/'+worldname+'.world'
-        if not (os.path.isfile('world/{}.world'.format(worldname) or argv[0] == '-o')):
+        self.wname = path+'/world/'+worldname+'.world'
+        if not (os.path.isfile(self.wname) or '-o' in options):
             self.world_mode = 'Creating new world: '
             chunk_dict = {}
             world_file = open(self.wname, 'wb')
@@ -88,4 +88,3 @@ class world:
 
     def return_time(self):
         return 'Exposed block calculation: {}\n{}{}'.format(self.time_required[1], self.world_mode, self.time_required[0])
-

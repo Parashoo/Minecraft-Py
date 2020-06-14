@@ -3,17 +3,21 @@ import glm
 import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
-from packages import utilities
-from packages import chunk, render, world_gen
 
-vertex_source_3d = 'shaders/scene.vs'
-fragment_source_3d = 'shaders/scene.fs'
+import sys
+import os
+masterpath = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(masterpath)
+from packages import utilities, chunk, render, world_gen
 
-vertex_source_GUI = 'shaders/hud.vs'
-fragment_source_GUI = 'shaders/hud.fs'
+vertex_source_3d = masterpath + '/shaders/scene.vs'
+fragment_source_3d = masterpath + '/shaders/scene.fs'
 
-vertex_source_sky = 'shaders/sky.vs'
-fragment_source_sky = 'shaders/sky.fs'
+vertex_source_GUI = masterpath + '/shaders/hud.vs'
+fragment_source_GUI = masterpath + '/shaders/hud.fs'
+
+vertex_source_sky = masterpath + '/shaders/sky.vs'
+fragment_source_sky = masterpath + '/shaders/sky.fs'
 
 camera = utilities.camera((0, 16, 0), (0, 0, 0), (800, 600))
 
@@ -26,7 +30,7 @@ def main():
 
     fps_list = []
 
-    test_world = world_gen.world('__DELETEME__', '-o')
+    test_world = world_gen.world('__DELETEME__', masterpath, '-o')
     window = utilities.window()
     camera.setup_window(window)
     glEnable(GL_DEPTH_TEST)
@@ -73,10 +77,10 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    cobble_tex = utilities.texture('ressources/cobblestone.png')
+    cobble_tex = utilities.texture(masterpath + '/ressources/blocks/cobblestone.png')
     cobble_tex_ID = cobble_tex.gen_texture()
 
-    crosshair_texture = utilities.texture('ressources/icons.png', crop = (0,0,16,16))
+    crosshair_texture = utilities.texture(masterpath + '/ressources/blocks/icons.png', crop = (0,0,16,16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
     exposed_list = test_world.return_all_exposed()
@@ -138,6 +142,7 @@ def main():
         glBindVertexArray(vao_2d)
         glPointSize(32)
         glDrawArrays(GL_POINTS, 0, 1)
+        print('Average FPS: {}'.format(np.mean(fps_list)))
 
         if second_counter >= 1:
             fps_list.append(frame_counter)
@@ -146,7 +151,6 @@ def main():
 
     window.close()
     print('\n===== End statistics =====')
-    print('Average FPS: {}'.format(np.mean(fps_list)))
     print(test_world.return_time(),'\n')
 
 if __name__ == '__main__':
