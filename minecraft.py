@@ -12,7 +12,7 @@ from packages import utilities, chunk, render, world_gen
 
 shaderpath = rootpath / "shaders"
 texturepath = rootpath / "ressources"
-blocktexturepath = texturepath / "blocks"
+blocktexturepath = texturepath / "block"
 
 vertex_source_3d = shaderpath / "scene.vs"
 fragment_source_3d = shaderpath / "scene.fs"
