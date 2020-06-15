@@ -1,20 +1,23 @@
 import numpy as np
-import os.path
+from pathlib import Path
+import os, sys
 from json import dumps, loads
 from math import floor
 from packages import chunk
 from time import time
 
 class world:
-    def __init__(self, worldname, path, *options):
-
+    def __init__(self, worldname, *options):
+        rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
         now = time()
         self.world_mode = 'Loading existing world: '
-        self.wname = path+'/world/'+worldname+'.world'
-        if not (os.path.isfile(self.wname) or '-o' in options):
+        self.wpath = rootpath / "world" / (worldname+".world")
+        if (not self.wpath.is_file()) or '-o' in options:
+            sys.stdout.write("Creating new world...")
+            sys.stdout.flush()
             self.world_mode = 'Creating new world: '
             chunk_dict = {}
-            world_file = open(self.wname, 'wb')
+            world_file = open(self.wpath, 'wb')
             writelines_list = []
             line_counter = 0
             for index, stuff in np.ndenumerate(np.zeros((8, 8))):
@@ -28,11 +31,15 @@ class world:
             writelines_list = [(dumps(chunk_dict)+'\n').encode('utf-8')] + writelines_list
             world_file.writelines(writelines_list)
             world_file.close()
-
-        with open(self.wname, 'r') as wdata:
+        else:
+            sys.stdout.write("Loading existing world...")
+            sys.stdout.flush()
+        with open(self.wpath, 'r') as wdata:
             wlines = wdata.readlines()
             self.chunk_dict = loads(wlines[0])
             self.world_lines = wlines[1:]
+            sys.stdout.write("Done\n")
+            sys.stdout.flush()
 
         elapsed = time() - now
         self.time_required = [elapsed]
@@ -64,6 +71,8 @@ class world:
 
     def return_all_exposed(self):
         now = time()
+        sys.stdout.write("Calculating exposed blocks... ")
+        sys.stdout.flush()
         exposed_blocks = []
         for chunk_corner_str, line in self.chunk_dict.items():
             chunk_corner = eval(chunk_corner_str)
@@ -82,7 +91,8 @@ class world:
             target.from_bytes(self.world_lines[line][:-1])
             exposed_blocks = exposed_blocks + target.return_exposed(chunk_corner, neighbours)
         elapsed = time() - now
-
+        sys.stdout.write("Done\n")
+        sys.stdout.flush()
         self.time_required.append(elapsed)
         return exposed_blocks
 

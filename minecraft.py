@@ -4,20 +4,24 @@ import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
 
-import sys
-import os
-masterpath = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(masterpath)
+import sys, os
+from pathlib import Path
+rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
+sys.path.append(rootpath)
 from packages import utilities, chunk, render, world_gen
 
-vertex_source_3d = masterpath + '/shaders/scene.vs'
-fragment_source_3d = masterpath + '/shaders/scene.fs'
+shaderpath = rootpath / "shaders"
+texturepath = rootpath / "ressources"
+blocktexturepath = texturepath / "blocks"
 
-vertex_source_GUI = masterpath + '/shaders/hud.vs'
-fragment_source_GUI = masterpath + '/shaders/hud.fs'
+vertex_source_3d = shaderpath / "scene.vs"
+fragment_source_3d = shaderpath / "scene.fs"
 
-vertex_source_sky = masterpath + '/shaders/sky.vs'
-fragment_source_sky = masterpath + '/shaders/sky.fs'
+vertex_source_GUI = shaderpath / "hud.vs"
+fragment_source_GUI = shaderpath / "hud.fs"
+
+vertex_source_sky = shaderpath / "sky.vs"
+fragment_source_sky = shaderpath / "sky.fs"
 
 camera = utilities.camera((0, 16, 0), (0, 0, 0), (800, 600))
 
@@ -30,9 +34,10 @@ def main():
 
     fps_list = []
 
-    test_world = world_gen.world('__DELETEME__', masterpath, '-o')
+    test_world = world_gen.world('__DELETEME__')
     window = utilities.window()
     camera.setup_window(window)
+
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -77,10 +82,10 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    cobble_tex = utilities.texture(masterpath + '/ressources/blocks/cobblestone.png')
+    cobble_tex = utilities.texture(blocktexturepath / "cobblestone.png")
     cobble_tex_ID = cobble_tex.gen_texture()
 
-    crosshair_texture = utilities.texture(masterpath + '/ressources/blocks/icons.png', crop = (0,0,16,16))
+    crosshair_texture = utilities.texture(texturepath / "icons.png", crop = (0,0,16,16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
     exposed_list = test_world.return_all_exposed()
@@ -142,7 +147,6 @@ def main():
         glBindVertexArray(vao_2d)
         glPointSize(32)
         glDrawArrays(GL_POINTS, 0, 1)
-        print('Average FPS: {}'.format(np.mean(fps_list)))
 
         if second_counter >= 1:
             fps_list.append(frame_counter)
@@ -151,6 +155,7 @@ def main():
 
     window.close()
     print('\n===== End statistics =====')
+    print("Average FPS: {}".format(np.mean(fps_list)))
     print(test_world.return_time(),'\n')
 
 if __name__ == '__main__':

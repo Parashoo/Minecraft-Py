@@ -1,9 +1,12 @@
 import glm
 import numpy as np
+import sys
 from OpenGL.GL import *
 
 class render:
     def __init__(self, coords_list):
+        sys.stdout.write("Creating render buffer... ")
+        sys.stdout.flush()
         self.render_list = []
         for i in coords_list:
             self.render_list.append([
@@ -61,6 +64,8 @@ class render:
         glEnableVertexAttribArray(1)
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 32, ctypes.c_void_p(20))
         glEnableVertexAttribArray(2)
+        sys.stdout.write("Done\n")
+        sys.stdout.flush()
 
     def draw_buffer(self, program, texture):
         program.use()

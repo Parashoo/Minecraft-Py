@@ -2,8 +2,9 @@ import glfw
 import numpy as np
 import glm
 import time
-import os
+import sys, os
 
+from pathlib import Path
 from OpenGL.GL import *
 from PIL import Image
 
@@ -120,18 +121,18 @@ class camera:
         self.sensitivity = new_sensitivity
 
 class shader:
-    def __init__(self, vertexShaderPath, fragmentShaderPath, version_string):
+    def __init__(self, vertex_shader_path, fragment_shader_path, version_string):
 
-        with open(vertexShaderPath, 'r') as file:
-            self.vertexShaderData = file.read() % version_string
+        with open(vertex_shader_path, 'r') as file:
+            self.vertex_shader_data = file.read() % version_string
 
-        with open(fragmentShaderPath, 'r') as file:
-            self.fragmentShaderData = file.read() % version_string
+        with open(fragment_shader_path, 'r') as file:
+            self.fragment_shader_data = file.read() % version_string
 
     def compile(self):
 
         vertexShader = glCreateShader(GL_VERTEX_SHADER)
-        glShaderSource(vertexShader, self.vertexShaderData)
+        glShaderSource(vertexShader, self.vertex_shader_data)
         glCompileShader(vertexShader)
 
         success = glGetShaderiv(vertexShader, GL_COMPILE_STATUS)
@@ -140,7 +141,7 @@ class shader:
             print('Error: Vertex shader compilation failed\n', infoLog)
 
         fragmentShader = glCreateShader(GL_FRAGMENT_SHADER)
-        glShaderSource(fragmentShader, self.fragmentShaderData)
+        glShaderSource(fragmentShader, self.fragment_shader_data)
         glCompileShader(fragmentShader)
 
         success = glGetShaderiv(fragmentShader, GL_COMPILE_STATUS)
@@ -243,6 +244,8 @@ class texture:
 
 class window:
     def __init__(self, *options, **even_more_options):
+        sys.stdout.write("Creating window... ")
+        sys.stdout.flush()
         OpenGL_version = '3.3'
         self.size = [800, 600]
         title = '__DELETEME__'
@@ -272,6 +275,8 @@ class window:
 
         glfw.make_context_current(self.window)
         glfw.set_framebuffer_size_callback(self.window, self.window_resize_callback)
+        sys.stdout.write("Done\n")
+        sys.stdout.flush()
 
     def refresh(self, step, *options):
         color = (0.2, 0.3, 0.3, 1.0)
