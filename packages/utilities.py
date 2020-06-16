@@ -4,7 +4,6 @@ import glm
 import time
 import sys, os
 
-from pathlib import Path
 from OpenGL.GL import *
 from PIL import Image
 
@@ -209,7 +208,7 @@ class texture:
             self.tex_file = Image.open(self.source)
         except FileNotFoundError:
             print('\033[1m\033[91m[TEXTURE ERROR]: Given file does not exist\033[0m\n')
-            self.tex_file = Image.open('ressources/blocks/missing.png')
+            self.tex_file = Image.open('ressources/block/missing.png')
         if 'flip' in kwargs.keys():
             self.tex_file = self.tex_file.rotate(180)
         if 'crop' in kwargs.keys():

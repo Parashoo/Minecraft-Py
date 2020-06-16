@@ -1,6 +1,7 @@
 import glm
 import numpy as np
-import sys
+import sys, os
+from pathlib import Path
 from OpenGL.GL import *
 
 class render:
@@ -72,3 +73,22 @@ class render:
         glBindTexture(GL_TEXTURE_2D, texture)
         glBindVertexArray(self.render_vao)
         glDrawArrays(GL_TRIANGLES, 0, len(self.render_list) * 36)
+
+def load_all_block_textures(sourcepath):
+    block_tex_array = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D_ARRAY, block_tex_array)
+    glTexStorage3D(GL_TEXTURE_2D_ARRAY,
+      3, #Max mipmap level
+      GL_RGBA, #File format
+      16, 16, #Image size
+      20 #Layer count
+    )
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT)
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    for texture, num in enumerate(sourcepath.iterdir()):
+        tex_file = Image.open()
+        tex_data = np.array(list(tex_file.getdata()), np.int8)
+        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, num, 16, 16, 1, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)
+    glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
