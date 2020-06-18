@@ -103,6 +103,8 @@ def main():
     chunk_render = render.render(exposed_list)
     chunk_render.create_buffers()
 
+    megatex = render.load_all_block_textures(blocktexturepath)
+
     while not window.check_if_closed():
 
         current_frame = get_time()
@@ -128,12 +130,12 @@ def main():
 
         pos, looking, up = camera.return_vectors()
         view = glm.lookAt(pos, looking, up)
-        projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 100)
+        projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
         shader_program.set_mat4('view', glm.value_ptr(view))
         shader_program.set_mat4('projection', glm.value_ptr(projection))
 
         glEnable(GL_DEPTH_TEST)
-        chunk_render.draw_buffer(shader_program, cobble_tex_ID)
+        chunk_render.draw_buffer(shader_program, megatex)
 
         glBindVertexArray(0)
 

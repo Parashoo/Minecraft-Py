@@ -67,7 +67,7 @@ class chunk:
             if x == 0:
                 neighbours[1] = west_chunk[15, y, z]
             if 0 in neighbours:
-                exposed_list.append(coords_in_world)
+                exposed_list.append(coords_in_world + tuple([blocktype]))
             neighbours = []
         return exposed_list
 
