@@ -6,10 +6,10 @@ from math import sin, cos
 
 import sys, os
 from pathlib import Path
-rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
-sys.path.append(rootpath)
+sys.path.append(Path(os.path.abspath(os.path.dirname(sys.argv[0]))))
 from packages import utilities, chunk, render, world_gen
 
+rootpath = Path()
 shaderpath = rootpath / "shaders"
 texturepath = rootpath / "ressources"
 blocktexturepath = texturepath / "block"
@@ -82,9 +82,6 @@ def main():
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
     glEnableVertexAttribArray(1)
 
-    cobble_tex = utilities.texture(blocktexturepath / "cobblestone.png")
-    cobble_tex_ID = cobble_tex.gen_texture()
-
     crosshair_texture = utilities.texture(texturepath / "icons.png", crop = (0,0,16,16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
@@ -103,7 +100,7 @@ def main():
     chunk_render = render.render(exposed_list)
     chunk_render.create_buffers()
 
-    megatex = render.load_all_block_textures(blocktexturepath)
+    all_textures, layers = render.load_all_block_textures(blocktexturepath)
 
     while not window.check_if_closed():
 
@@ -135,7 +132,7 @@ def main():
         shader_program.set_mat4('projection', glm.value_ptr(projection))
 
         glEnable(GL_DEPTH_TEST)
-        chunk_render.draw_buffer(shader_program, megatex)
+        chunk_render.draw_buffer(shader_program, all_textures)
 
         glBindVertexArray(0)
 

@@ -6,7 +6,7 @@ from pathlib import Path
 from OpenGL.GL import *
 
 class render:
-    def __init__(self, coords_list):
+    def __init__(self, coords_list, layer_list):
         sys.stdout.write("Creating render buffer... ")
         sys.stdout.flush()
         self.render_list = []
@@ -78,6 +78,7 @@ class render:
         glDrawArrays(GL_TRIANGLES, 0, len(self.render_list) * 36)
 
 def load_all_block_textures(sourcepath):
+    layer_list = {}
     block_tex_array = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D_ARRAY, block_tex_array)
     glTexStorage3D(GL_TEXTURE_2D_ARRAY,
@@ -95,5 +96,6 @@ def load_all_block_textures(sourcepath):
         tex_file = Image.open(texture)
         tex_data = np.array(list(tex_file.getdata()), np.int8)
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, num, 16, 16, 1, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)
+        layer_list.update({texture: num})
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
-    return block_tex_array
+    return block_tex_array, layer_list
