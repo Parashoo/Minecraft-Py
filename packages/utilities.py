@@ -137,7 +137,9 @@ class shader:
         success = glGetShaderiv(vertexShader, GL_COMPILE_STATUS)
         if not success:
             infoLog = glGetShaderInfoLog(vertexShader)
-            print('Error: Vertex shader compilation failed\n', infoLog)
+            print('Error: Vertex shader compilation failed')
+            print(infoLog.decode('utf-8'))
+            quit()
 
         fragmentShader = glCreateShader(GL_FRAGMENT_SHADER)
         glShaderSource(fragmentShader, self.fragment_shader_data)
@@ -146,7 +148,9 @@ class shader:
         success = glGetShaderiv(fragmentShader, GL_COMPILE_STATUS)
         if not success:
             infoLog = glGetShaderInfoLog(fragmentShader)
-            print('Error: Fragment shader compilation failed\n', infoLog)
+            print('Error: Fragment shader compilation failed')
+            print(infoLog.decode('utf-8'))
+            quit()
 
         self.program = glCreateProgram()
         glAttachShader(self.program, vertexShader)
@@ -157,7 +161,9 @@ class shader:
 
         if not success:
             infoLog = glGetProgramInfoLog(self.program)
-            print('Error: Shader program linking failed\n', infoLog)
+            print('Error: Shader program linking failed')
+            print(infoLog.decode('utf-8'))
+            quit()
 
         glDeleteShader(vertexShader)
         glDeleteShader(fragmentShader)

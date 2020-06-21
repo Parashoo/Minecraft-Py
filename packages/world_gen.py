@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 import os, sys
+import random
 from json import dumps, loads
 from math import floor
 from packages import chunk
@@ -24,7 +25,7 @@ class world:
                 index_x, index_z = index[0] - 4, index[1] - 4
                 coords_list = (index_x, index_z)
                 new_chunk = chunk.chunk()
-                new_chunk.fill_layers(0, index[0] + index[1], 1)
+                new_chunk.fill_layers(0, random.randint(1, 16), 9)
                 writelines_list.append(new_chunk.data.tostring()+'\n'.encode('utf-8'))
                 chunk_dict[str(coords_list)] = line_counter
                 line_counter += 1

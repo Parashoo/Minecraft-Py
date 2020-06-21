@@ -9,7 +9,7 @@ class chunk:
         raw_data = np.fromstring(bytes(string, 'utf-8'), dtype = 'uint8')
         self.data = raw_data.reshape(16, 256, 16)
 
-    def fill_layers(self,bottom_layer, top_layer, block_type):
+    def fill_layers(self, bottom_layer, top_layer, block_type):
         for i in range(top_layer - bottom_layer):
             self.data[:,i+bottom_layer,:] = np.full((16, 16), block_type, dtype = 'uint32')
 
