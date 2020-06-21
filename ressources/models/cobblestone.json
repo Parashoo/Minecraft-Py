@@ -1,6 +1,7 @@
 {
-  "textures":
-  {
+  "blockid": "cobblestone",
+  "blocknum": 5,
+  "textures": {
     "top": "cobblestone.png",
     "bottom": "cobblestone.png",
     "north": "cobblestone.png",

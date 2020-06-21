@@ -1,4 +1,6 @@
 {
+  "blockid": "gravel",
+  "blocknum": 6,
   "textures":
   {
     "top": "gravel.png",

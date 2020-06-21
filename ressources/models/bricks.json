@@ -1,4 +1,6 @@
 {
+  "blockid": "bricks",
+  "blocknum": 4,
   "textures":
   {
     "top": "bricks.png",

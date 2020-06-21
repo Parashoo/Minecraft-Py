@@ -1,4 +1,6 @@
 {
+  "blockid": "grass",
+  "blocknum": 3,
   "textures":
   {
     "top": "grass_block_top.png",

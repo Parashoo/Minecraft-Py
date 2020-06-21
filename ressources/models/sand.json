@@ -1,4 +1,6 @@
 {
+  "blockid": "sand",
+  "blocknum": 7,
   "textures":
   {
     "top": "sand.png",
