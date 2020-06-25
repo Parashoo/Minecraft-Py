@@ -10,6 +10,6 @@ def load_all(root):
     path = root / "ressources" / "models"
     model_dict = {}
     for file in path.iterdir():
-        model = load(file)
+        model = load(root, file)
         model_dict.update({model["blocknum"]: model})
     return model_dict

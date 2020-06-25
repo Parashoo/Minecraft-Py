@@ -7,9 +7,9 @@ from math import sin, cos
 import sys, os
 from pathlib import Path
 sys.path.append(Path(os.path.abspath(os.path.dirname(sys.argv[0]))))
-from packages import utilities, chunk, render, world_gen
+from packages import utilities, chunk, render, world_gen, model
 
-rootpath = Path()
+rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
 shaderpath = rootpath / "shaders"
 texturepath = rootpath / "ressources"
 blocktexturepath = texturepath / "block"
@@ -97,10 +97,11 @@ def main():
     second_counter = 0
     frame_counter = 0
 
-    chunk_render = render.render(exposed_list)
-    chunk_render.create_buffers()
-
     all_textures, layers = render.load_all_block_textures(blocktexturepath)
+    all_models = model.load_all(rootpath)
+
+    chunk_render = render.render(exposed_list, layers, all_models)
+    chunk_render.create_buffers()
 
     while not window.check_if_closed():
 

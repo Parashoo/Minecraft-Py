@@ -6,53 +6,53 @@ from pathlib import Path
 from OpenGL.GL import *
 
 class render:
-    def __init__(self, coords_list, layer_list):
+    def __init__(self, coords_list, layer_list, model_list):
         sys.stdout.write("Creating render buffer... ")
         sys.stdout.flush()
         self.render_list = []
         for num, i in enumerate(coords_list):
             self.render_list.append([
-                0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  1.0,  0.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
+                0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
+                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
+                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
+                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
+                0.0,  1.0,  0.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
+                0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
 
-                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  1.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
+                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
+                1.0,  0.0,  1.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
+                1.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
+                1.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
+                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
+                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
 
-                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
-                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
+                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
+                0.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
+                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
+                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
+                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
+                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
 
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
+                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
+                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
+                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
+                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
+                1.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
+                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
 
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                1.0,  0.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
+                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
+                1.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
+                1.0,  0.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
+                1.0,  0.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
+                0.0,  0.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
+                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
 
-                0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], i[3],
-                0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], i[3]
+                0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
+                1.0,  1.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
+                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
+                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
+                0.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
+                0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]]
             ])
 
     def create_buffers(self):
@@ -96,6 +96,6 @@ def load_all_block_textures(sourcepath):
         tex_file = Image.open(texture)
         tex_data = np.array(list(tex_file.getdata()), np.int8)
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, num, 16, 16, 1, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)
-        layer_list.update({texture: num})
+        layer_list.update({str(texture)[len(str(sourcepath))+1:]: num})
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
     return block_tex_array, layer_list

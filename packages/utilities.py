@@ -251,32 +251,13 @@ class window:
     def __init__(self, *options, **even_more_options):
         sys.stdout.write("Creating window... ")
         sys.stdout.flush()
-        OpenGL_version = '3.3'
-        self.size = [800, 600]
-        title = '__DELETEME__'
-        if options:
-            if len(options) == 1:
-                OpenGL_version = options[0]
-
-            if len(options) == 2:
-                size = options[1]
-
-        if len(options) == 3:
-            title = options[2]
-        try:
-            version_major, version_minor = int(OpenGL_version.split('.')[0]), int(OpenGL_version.split('.')[1][0])
-            if float(OpenGL_version) > 4.5:
-                print('[OPENGL ERROR]: This version does not exist yet, reverting to OpenGL 3.3 instead\n')
-        except ValueError:
-            print('[OPENGL ERROR]: Invalid OpenGL version, reverting to 3.3 instead\n')
-            version_major, version_minor = 3, 3
 
         glfw.init()
-        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, version_major)
-        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, version_minor)
+        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-        self.window = glfw.create_window(self.size[0], self.size[1], title, None, None)
+        self.window = glfw.create_window(800, 600, "__DELETEME__", None, None)
 
         glfw.make_context_current(self.window)
         glfw.set_framebuffer_size_callback(self.window, self.window_resize_callback)
