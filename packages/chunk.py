@@ -1,6 +1,7 @@
 import numpy as np
 
 class chunk:
+    faces = ['east', 'west', 'top', 'bottom', 'north', 'south']
     def __init__(self):
         self.data = np.zeros((16, 256, 16), dtype = 'uint8')
         self.remarkable = {'top_non_air_layer': 0}
@@ -25,8 +26,6 @@ class chunk:
         exposed_list = []
         self.find_highest_non_transparent()
         north_chunk, south_chunk, east_chunk, west_chunk = neighbours
-
-        edge = [0,0,0,0]
         chunk_slice = self.data[:,0:self.remarkable['top_non_air_layer']+1,:]
         for coords, blocktype in np.ndenumerate(chunk_slice):
             x, y, z = coords
@@ -66,8 +65,9 @@ class chunk:
                 neighbours[5] = south_chunk[x, y, 15]
             if x == 0:
                 neighbours[1] = west_chunk[15, y, z]
-            if 0 in neighbours:
-                exposed_list.append(coords_in_world + tuple([blocktype]))
+            exposed_faces = [index for index, item in enumerate(neighbours) if item == 0]
+            for i in exposed_faces:
+                exposed_list.append(coords_in_world + (blocktype,) + (chunk.faces[i],))
             neighbours = []
         return exposed_list
 

@@ -6,54 +6,68 @@ from pathlib import Path
 from OpenGL.GL import *
 
 class render:
+    faces = {
+            "south": [
+              0.0,  0.0,  0.0,  1.0, 1.0,
+              1.0,  0.0,  0.0,  0.0, 1.0,
+              1.0,  1.0,  0.0,  0.0, 0.0,
+              1.0,  1.0,  0.0,  0.0, 0.0,
+              0.0,  1.0,  0.0,  1.0, 0.0,
+              0.0,  0.0,  0.0,  1.0, 1.0],
+
+            "north": [
+              0.0,  0.0,  1.0,  1.0, 1.0,
+              1.0,  0.0,  1.0,  0.0, 1.0,
+              1.0,  1.0,  1.0,  0.0, 0.0,
+              1.0,  1.0,  1.0,  0.0, 0.0,
+              0.0,  1.0,  1.0,  1.0, 0.0,
+              0.0,  0.0,  1.0,  1.0, 1.0],
+
+            "west": [
+              0.0,  1.0,  1.0,  1.0, 0.0,
+              0.0,  1.0,  0.0,  0.0, 0.0,
+              0.0,  0.0,  0.0,  0.0, 1.0,
+              0.0,  0.0,  0.0,  0.0, 1.0,
+              0.0,  0.0,  1.0,  1.0, 1.0,
+              0.0,  1.0,  1.0,  1.0, 0.0],
+
+            "east": [
+              1.0,  1.0,  1.0,  1.0, 0.0,
+              1.0,  1.0,  0.0,  0.0, 0.0,
+              1.0,  0.0,  0.0,  0.0, 1.0,
+              1.0,  0.0,  0.0,  0.0, 1.0,
+              1.0,  0.0,  1.0,  1.0, 1.0,
+              1.0,  1.0,  1.0,  1.0, 0.0],
+
+            "bottom": [
+              0.0,  0.0,  0.0,  0.0, 1.0,
+              1.0,  0.0,  0.0,  1.0, 1.0,
+              1.0,  0.0,  1.0,  1.0, 0.0,
+              1.0,  0.0,  1.0,  1.0, 0.0,
+              0.0,  0.0,  1.0,  0.0, 0.0,
+              0.0,  0.0,  0.0,  0.0, 1.0],
+
+            "top": [
+              0.0,  1.0,  0.0,  0.0, 1.0,
+              1.0,  1.0,  0.0,  1.0, 1.0,
+              1.0,  1.0,  1.0,  1.0, 0.0,
+              1.0,  1.0,  1.0,  1.0, 0.0,
+              0.0,  1.0,  1.0,  0.0, 0.0,
+              0.0,  1.0,  0.0,  0.0, 1.0]
+             }
+
     def __init__(self, coords_list, layer_list, model_list):
         sys.stdout.write("Creating render buffer... ")
         sys.stdout.flush()
         self.render_list = []
-        for num, i in enumerate(coords_list):
+        for i in coords_list:
             self.render_list.append([
-                0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
-                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
-                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
-                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
-                0.0,  1.0,  0.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
-                0.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["south"]],
-
-                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
-                1.0,  0.0,  1.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
-                1.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
-                1.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
-                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
-                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["north"]],
-
-                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
-                0.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
-                0.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
-                0.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["west"]],
-
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
-                1.0,  1.0,  0.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
-                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
-                1.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
-                1.0,  0.0,  1.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["east"]],
-
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
-                1.0,  0.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
-                1.0,  0.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
-                1.0,  0.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
-                0.0,  0.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
-                0.0,  0.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["bottom"]],
-
-                0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
-                1.0,  1.0,  0.0,  1.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
-                1.0,  1.0,  1.0,  1.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
-                0.0,  1.0,  1.0,  0.0, 0.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]],
-                0.0,  1.0,  0.0,  0.0, 1.0, i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"]["top"]]
-            ])
+                render.faces[i[4]][0] ,  render.faces[i[4]][1] ,  render.faces[i[4]][2] ,  render.faces[i[4]][3] , render.faces[i[4]][4] , i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
+                render.faces[i[4]][5] ,  render.faces[i[4]][6] ,  render.faces[i[4]][7] ,  render.faces[i[4]][8] , render.faces[i[4]][9] , i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
+                render.faces[i[4]][10],  render.faces[i[4]][11],  render.faces[i[4]][12],  render.faces[i[4]][13], render.faces[i[4]][14], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
+                render.faces[i[4]][15],  render.faces[i[4]][16],  render.faces[i[4]][17],  render.faces[i[4]][18], render.faces[i[4]][19], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
+                render.faces[i[4]][20],  render.faces[i[4]][21],  render.faces[i[4]][22],  render.faces[i[4]][23], render.faces[i[4]][24], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
+                render.faces[i[4]][25],  render.faces[i[4]][26],  render.faces[i[4]][27],  render.faces[i[4]][28], render.faces[i[4]][29], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]]])
 
     def create_buffers(self):
         render_vbo, self.render_vao = glGenBuffers(1), glGenVertexArrays(1)
