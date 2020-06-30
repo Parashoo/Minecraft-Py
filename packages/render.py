@@ -4,6 +4,7 @@ import sys, os
 from PIL import Image
 from pathlib import Path
 from OpenGL.GL import *
+import time
 
 class render:
     faces = {
@@ -59,6 +60,7 @@ class render:
     def __init__(self, coords_list, layer_list, model_list):
         sys.stdout.write("Creating render buffer... ")
         sys.stdout.flush()
+        now = time.time()
         self.render_list = []
         for i in coords_list:
             self.render_list.append([
@@ -68,8 +70,6 @@ class render:
                 render.faces[i[4]][15],  render.faces[i[4]][16],  render.faces[i[4]][17],  render.faces[i[4]][18], render.faces[i[4]][19], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
                 render.faces[i[4]][20],  render.faces[i[4]][21],  render.faces[i[4]][22],  render.faces[i[4]][23], render.faces[i[4]][24], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
                 render.faces[i[4]][25],  render.faces[i[4]][26],  render.faces[i[4]][27],  render.faces[i[4]][28], render.faces[i[4]][29], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]]])
-
-    def create_buffers(self):
         render_vbo, self.render_vao = glGenBuffers(1), glGenVertexArrays(1)
         glBindVertexArray(self.render_vao)
         glBindBuffer(GL_ARRAY_BUFFER, render_vbo)
@@ -84,6 +84,7 @@ class render:
         glEnableVertexAttribArray(3)
         sys.stdout.write("Done\n")
         sys.stdout.flush()
+        self.time_required = time.time() - now
 
     def draw_buffer(self, program, texture):
         program.use()

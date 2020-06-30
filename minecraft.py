@@ -101,7 +101,6 @@ def main():
     all_models = model.load_all(rootpath)
 
     chunk_render = render.render(exposed_list, layers, all_models)
-    chunk_render.create_buffers()
 
     while not window.check_if_closed():
 
@@ -156,7 +155,8 @@ def main():
     window.close()
     print('\n===== End statistics =====')
     print("Average FPS: {}".format(np.mean(fps_list)))
-    print(test_world.return_time(),'\n')
+    print("Render buffer creation: ", chunk_render.time_required)
+    print(test_world.return_time())
 
 if __name__ == '__main__':
     main()
