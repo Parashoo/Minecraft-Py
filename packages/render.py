@@ -92,7 +92,6 @@ def load_all_block_textures(sourcepath):
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT)
     for num, texture in enumerate(sourcepath.iterdir()):
-        print(num, texture)
         tex_file = Image.open(texture)
         tex_data = np.array(list(tex_file.getdata()), np.int8)
         glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, num, 16, 16, 1, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)

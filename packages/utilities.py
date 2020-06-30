@@ -252,12 +252,14 @@ class window:
         sys.stdout.write("Creating window... ")
         sys.stdout.flush()
 
+        self.size = [800, 600]
+
         glfw.init()
         glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-        self.window = glfw.create_window(800, 600, "__DELETEME__", None, None)
+        self.window = glfw.create_window(self.size[0], self.size[1], "__DELETEME__", None, None)
 
         glfw.make_context_current(self.window)
         glfw.set_framebuffer_size_callback(self.window, self.window_resize_callback)
