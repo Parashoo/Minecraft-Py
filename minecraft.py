@@ -1,4 +1,4 @@
-from glfw import get_time
+import glfw
 import glm
 import numpy as np
 from OpenGL.GL import *
@@ -104,7 +104,7 @@ def main():
 
     while not window.check_if_closed():
 
-        current_frame = get_time()
+        current_frame = glfw.get_time()
         delta_time = current_frame - last_frame
         last_frame = current_frame
         second_counter += delta_time
@@ -133,6 +133,8 @@ def main():
 
         glEnable(GL_DEPTH_TEST)
         world_render.draw_buffer(shader_program_scene, all_textures)
+        if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
+            world_render.update_buffer(camera)
 
         glBindVertexArray(0)
 
