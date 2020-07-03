@@ -1,4 +1,4 @@
-from glfw import get_time
+import glfw
 import glm
 import numpy as np
 from OpenGL.GL import *
@@ -44,11 +44,11 @@ def main():
     crosshair = np.array([
       0.0, 0.0, 0.0], dtype = 'float32')
 
-    shader_program = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
-    shader_program.compile()
+    shader_program_scene = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
+    shader_program_scene.compile()
 
-    shader_program_2d = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
-    shader_program_2d.compile()
+    shader_program_hud = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
+    shader_program_hud.compile()
 
     shader_program_sky = utilities.shader(vertex_source_sky, fragment_source_sky, '330')
     shader_program_sky.compile()
@@ -87,11 +87,11 @@ def main():
 
     exposed_list = test_world.return_all_exposed()
 
-    shader_program.use()
-    shader_program.set_int('texture0', 0)
+    shader_program_scene.use()
+    shader_program_scene.set_int('texture0', 0)
 
-    shader_program_2d.use()
-    shader_program_2d.set_int('texture0', 0)
+    shader_program_hud.use()
+    shader_program_hud.set_int('texture0', 0)
 
     camera_direction = glm.vec3()
     second_counter = 0
@@ -100,12 +100,11 @@ def main():
     all_textures, layers = render.load_all_block_textures(blocktexturepath)
     all_models = model.load_all(rootpath)
 
-    chunk_render = render.render(exposed_list, layers, all_models)
-    chunk_render.create_buffers()
+    world_render = render.render(exposed_list, layers, all_models)
 
     while not window.check_if_closed():
 
-        current_frame = get_time()
+        current_frame = glfw.get_time()
         delta_time = current_frame - last_frame
         last_frame = current_frame
         second_counter += delta_time
@@ -124,16 +123,18 @@ def main():
 
         glActiveTexture(GL_TEXTURE0)
 
-        shader_program.use()
+        shader_program_scene.use()
 
         pos, looking, up = camera.return_vectors()
         view = glm.lookAt(pos, looking, up)
         projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
-        shader_program.set_mat4('view', glm.value_ptr(view))
-        shader_program.set_mat4('projection', glm.value_ptr(projection))
+        shader_program_scene.set_mat4('view', glm.value_ptr(view))
+        shader_program_scene.set_mat4('projection', glm.value_ptr(projection))
 
         glEnable(GL_DEPTH_TEST)
-        chunk_render.draw_buffer(shader_program, all_textures)
+        world_render.draw_buffer(shader_program_scene, all_textures)
+        if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
+            world_render.update_buffer(camera)
 
         glBindVertexArray(0)
 
@@ -141,7 +142,7 @@ def main():
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, crosshair_texture_ID)
 
-        shader_program_2d.use()
+        shader_program_hud.use()
 
 
         glBindVertexArray(vao_2d)
@@ -156,7 +157,8 @@ def main():
     window.close()
     print('\n===== End statistics =====')
     print("Average FPS: {}".format(np.mean(fps_list)))
-    print(test_world.return_time(),'\n')
+    print("Render buffer creation: ", world_render.time_required)
+    print(test_world.return_time())
 
 if __name__ == '__main__':
     main()
