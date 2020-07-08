@@ -44,13 +44,13 @@ def main():
     crosshair = np.array([
       0.0, 0.0, 0.0], dtype = 'float32')
 
-    shader_program_scene = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
+    shader_program_scene = utilities.shader(vertex_source_3d, fragment_source_3d, '450')
     shader_program_scene.compile()
 
-    shader_program_hud = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
+    shader_program_hud = utilities.shader(vertex_source_GUI, fragment_source_GUI, '450')
     shader_program_hud.compile()
 
-    shader_program_sky = utilities.shader(vertex_source_sky, fragment_source_sky, '330')
+    shader_program_sky = utilities.shader(vertex_source_sky, fragment_source_sky, '450')
     shader_program_sky.compile()
 
     sky = np.array([

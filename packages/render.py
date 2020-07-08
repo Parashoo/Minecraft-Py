@@ -75,7 +75,19 @@ class render:
         self.render_vbo, self.render_vao = glGenBuffers(1), glGenVertexArrays(1)
         glBindVertexArray(self.render_vao)
         glBindBuffer(GL_ARRAY_BUFFER, self.render_vbo)
-        glBufferData(GL_ARRAY_BUFFER, np.array(self.render_list, dtype='float32'), GL_DYNAMIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, np.array(self.render_list[round(len(self.render_list)/2):], dtype='float32'), GL_DYNAMIC_DRAW)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
+        glEnableVertexAttribArray(0)
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
+        glEnableVertexAttribArray(1)
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(20))
+        glEnableVertexAttribArray(2)
+        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(32))
+        glEnableVertexAttribArray(3)
+        self.render_vbo_2, self.render_vao_2 = glGenBuffers(1), glGenVertexArrays(1)
+        glBindVertexArray(self.render_vao_2)
+        glBindBuffer(GL_ARRAY_BUFFER, self.render_vbo_2)
+        glBufferData(GL_ARRAY_BUFFER, np.array(self.render_list[:round(len(self.render_list)/2)], dtype='float32'), GL_DYNAMIC_DRAW)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0))
         glEnableVertexAttribArray(0)
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12))
@@ -92,18 +104,13 @@ class render:
         program.use()
         glBindTexture(GL_TEXTURE_2D_ARRAY, texture)
         glBindVertexArray(self.render_vao)
-        glDrawArrays(GL_TRIANGLES, 0, len(self.render_list) * 36)
+        glDrawArrays(GL_TRIANGLES, 0, round(len(self.render_list)/2) * 6)
+        glBindVertexArray(self.render_vao_2)
+        glDrawArrays(GL_TRIANGLES, 0, (len(self.render_list) - round(len(self.render_list)/2)) * 6)
 
     def update_buffer(self, camera): #TESTING FUNCTION
-        glBindBuffer(GL_ARRAY_BUFFER, self.render_vbo)
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 216,
-        np.array([render.faces["top"][0] ,  render.faces["top"][1] ,  render.faces["top"][2] ,  render.faces["top"][3] , render.faces["top"][4] , round(camera.pos.x), round(camera.pos.y)-1, round(camera.pos.z), self.layer_list[self.model_list[5]["textures"]["top"]],
-                  render.faces["top"][5] ,  render.faces["top"][6] ,  render.faces["top"][7] ,  render.faces["top"][8] , render.faces["top"][9] , round(camera.pos.x), round(camera.pos.y)-1, round(camera.pos.z), self.layer_list[self.model_list[5]["textures"]["top"]],
-                  render.faces["top"][10],  render.faces["top"][11],  render.faces["top"][12],  render.faces["top"][13], render.faces["top"][14], round(camera.pos.x), round(camera.pos.y)-1, round(camera.pos.z), self.layer_list[self.model_list[5]["textures"]["top"]],
-                  render.faces["top"][15],  render.faces["top"][16],  render.faces["top"][17],  render.faces["top"][18], render.faces["top"][19], round(camera.pos.x), round(camera.pos.y)-1, round(camera.pos.z), self.layer_list[self.model_list[5]["textures"]["top"]],
-                  render.faces["top"][20],  render.faces["top"][21],  render.faces["top"][22],  render.faces["top"][23], render.faces["top"][24], round(camera.pos.x), round(camera.pos.y)-1, round(camera.pos.z), self.layer_list[self.model_list[5]["textures"]["top"]],
-                  render.faces["top"][25],  render.faces["top"][26],  render.faces["top"][27],  render.faces["top"][28], render.faces["top"][29], round(camera.pos.x), round(camera.pos.y)-1, round(camera.pos.z), self.layer_list[self.model_list[5]["textures"]["top"]]], dtype='float32'))
-
+        glBindBuffer(GL_ARRAY_BUFFER, self.render_vbo_2)
+        glBufferData(GL_ARRAY_BUFFER, np.array(self.render_list, dtype = 'float32'), GL_DYNAMIC_DRAW)
 
 def load_all_block_textures(sourcepath):
     layer_list = {}
