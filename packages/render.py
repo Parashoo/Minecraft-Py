@@ -72,6 +72,7 @@ class render:
                 render.faces[i[4]][15],  render.faces[i[4]][16],  render.faces[i[4]][17],  render.faces[i[4]][18], render.faces[i[4]][19], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
                 render.faces[i[4]][20],  render.faces[i[4]][21],  render.faces[i[4]][22],  render.faces[i[4]][23], render.faces[i[4]][24], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]],
                 render.faces[i[4]][25],  render.faces[i[4]][26],  render.faces[i[4]][27],  render.faces[i[4]][28], render.faces[i[4]][29], i[0], i[1], i[2], layer_list[model_list[i[3]]["textures"][i[4]]]])
+        print(len(self.render_list))
         self.render_vbo, self.render_vao = glGenBuffers(1), glGenVertexArrays(1)
         glBindVertexArray(self.render_vao)
         glBindBuffer(GL_ARRAY_BUFFER, self.render_vbo)
@@ -93,7 +94,7 @@ class render:
         glBindTexture(GL_TEXTURE_2D_ARRAY, texture)
         glBindVertexArray(self.render_vao)
         glDrawArrays(GL_TRIANGLES, 0, len(self.render_list) * 6)
-        
+
     def update_buffer(self, camera): #TESTING FUNCTION
         glBindBuffer(GL_ARRAY_BUFFER, self.render_vbo_2)
         glBufferData(GL_ARRAY_BUFFER, np.array(self.render_list, dtype = 'float32'), GL_DYNAMIC_DRAW)

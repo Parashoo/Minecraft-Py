@@ -3,68 +3,46 @@ import numpy as np
 class chunk:
     faces = ['east', 'west', 'top', 'bottom', 'north', 'south']
     def __init__(self):
-        self.data = np.zeros((16, 256, 16), dtype = 'uint8')
+        self.data = np.zeros((18, 257, 18), dtype = 'uint8')
         self.remarkable = {'top_non_air_layer': 0}
 
-    def from_bytes(self, string):
+    def load_data(self, string):
         raw_data = np.fromstring(bytes(string, 'utf-8'), dtype = 'uint8')
-        self.data = raw_data.reshape(16, 256, 16)
+        self.data = raw_data.reshape(18, 257, 18)
+
+    def load_neighbours(self, neighbours):        
+        north_chunk, south_chunk, east_chunk, west_chunk = neighbours
+        self.data[:,:,16] = north_chunk[:,:,1]
+        self.data[:,:,-1] = south_chunk[:,:,15]
+        self.data[16,:,:] = east_chunk[0,:,:]
+        self.data[-1,:,:] = west_chunk[15,:,:]
+        self.data[:,-1,:] = np.zeros((18, 18), dtype = 'uint8')
 
     def fill_layers(self, bottom_layer, top_layer, block_type):
         for i in range(top_layer - bottom_layer):
-            self.data[:,i+bottom_layer,:] = np.full((16, 16), block_type, dtype = 'uint32')
-
+            self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint32')
     def find_highest_non_transparent(self):
         empty_chunk_layer = np.zeros((16,16), dtype = 'uint8')
         for i in range(256):
             if not np.all(self.data[:,255-i,:] == empty_chunk_layer):
                 self.remarkable['top_non_air_layer'] = 255-i
+                return 255 - i
                 break
             else: pass
-
-    def return_exposed(self, corner, neighbours):
+    def return_exposed(self, corner):
         exposed_list = []
-        self.find_highest_non_transparent()
-        north_chunk, south_chunk, east_chunk, west_chunk = neighbours
-        chunk_slice = self.data[:,0:self.remarkable['top_non_air_layer']+1,:]
-        for coords, blocktype in np.ndenumerate(chunk_slice):
+        for coords, blocktype in np.ndenumerate(self.data[0:15, 0:self.find_highest_non_transparent(), 0:15]):
+            print(coords)
             x, y, z = coords
-            coords_in_world = (coords[0]+16*corner[0], coords[1], coords[2]+16*corner[1])
-            try:
-                neighbours = [self.data[x+1, y, z],
-                              self.data[x-1, y, z],
-                              self.data[x, y+1, z],
-                              self.data[x, y-1, z],
-                              self.data[x, y, z+1],
-                              self.data[x, y, z-1]]
-            except IndexError:
-                if x == 15 and not z == 15: # 256
-                    neighbours = [east_chunk[0, y, z],
-                                  self.data[x-1, y, z],
-                                  self.data[x, y+1, z],
-                                  self.data[x, y-1, z],
-                                  self.data[x, y, z+1],
-                                  self.data[x, y, z-1]]
-                if z == 15 and not x == 15: # 256
-                    neighbours = [self.data[x+1, y, z],
-                                  self.data[x-1, y, z],
-                                  self.data[x, y+1, z],
-                                  self.data[x, y-1, z],
-                                  north_chunk[x, y, 0],
-                                  self.data[x, y, z-1]]
-                if x == 15 and z == 15:
-                    neighbours = [east_chunk[0, y, z],
-                                  self.data[x-1, y, z],
-                                  self.data[x, y+1, z],
-                                  self.data[x, y-1, z],
-                                  north_chunk[x, y, 0],
-                                  self.data[x, y, z-1]]
-            if y == 0:
-                neighbours[3] = 0
-            if z == 0:
-                neighbours[5] = south_chunk[x, y, 15]
-            if x == 0:
-                neighbours[1] = west_chunk[15, y, z]
+            if blocktype == 0:
+                pass
+            coords_in_world = (x+16*corner[0], y, z+16*corner[1])
+            neighbours = [self.data[x+1, y, z],
+                          self.data[x-1, y, z],
+                          self.data[x, y+1, z],
+                          self.data[x, y-1, z],
+                          self.data[x, y, z+1],
+                          self.data[x, y, z-1]]
             exposed_faces = [index for index, item in enumerate(neighbours) if item == 0]
             for i in exposed_faces:
                 exposed_list.append(coords_in_world + (blocktype,) + (chunk.faces[i],))
@@ -73,5 +51,5 @@ class chunk:
 
 def return_chunk_data(line_string):
     target_chunk = chunk()
-    target_chunk.from_bytes(line_string)
+    target_chunk.load_data(line_string)
     return target_chunk.data

@@ -37,8 +37,7 @@ def main():
     global delta_time, last_frame
 
     fps_list = []
-
-    test_world = world_gen.world('__DELETEME__')
+    test_world = world_gen.world('__DELETEME__', '-o')
     window = utilities.window()
     camera.setup_window(window)
 
@@ -104,6 +103,7 @@ def main():
     all_textures, layers = render.load_all_block_textures(blocktexturepath)
     all_models = model.load_all(rootpath)
 
+    print(len(exposed_list))
     world_render = render.render(exposed_list, layers, all_models)
 
     while not window.check_if_closed():
