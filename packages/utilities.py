@@ -112,7 +112,6 @@ class camera:
         if glfw.get_key(parent.window, glfw.KEY_F) == glfw.RELEASE:
             self.direction_toggle = False
         if glfw.get_key(parent.window, glfw.KEY_O) == glfw.PRESS:
-            print('ASDFGHJKLÖ')
             print(self.pitch)
     def return_vectors(self):
         return self.pos, self.pos + self.front, self.up
@@ -123,10 +122,10 @@ class camera:
 class shader:
     def __init__(self, vertex_shader_path, fragment_shader_path, version_string):
 
-        with open(vertex_shader_path, 'r') as file:
+        with vertex_shader_path.open('r') as file:
             self.vertex_shader_data = file.read() % version_string
 
-        with open(fragment_shader_path, 'r') as file:
+        with fragment_shader_path.open('r') as file:
             self.fragment_shader_data = file.read() % version_string
 
     def compile(self):
@@ -256,8 +255,8 @@ class window:
         self.size = [800, 600]
 
         glfw.init()
-        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
-        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 5)
+        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
         self.window = glfw.create_window(self.size[0], self.size[1], "__DELETEME__", None, None)

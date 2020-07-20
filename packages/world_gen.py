@@ -10,17 +10,23 @@ from time import time
 class world:
     def __init__(self, worldname, *options):
         rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
+        worlddir = rootpath / "world"
         now = time()
         self.world_mode = 'Loading existing world: '
-        self.wpath = rootpath / "world" / (worldname+".world")
-        if (not self.wpath.is_file()) or '-o' in options:
+        if not worlddir.exists():
+            worlddir.mkdir()
+        self.worldpath = worlddir / (worldname+".world")
+        if not (self.worldpath.exists() or '-o' in options):
             sys.stdout.write("Creating new world...")
             sys.stdout.flush()
             self.world_mode = 'Creating new world: '
             chunk_dict = {}
-            world_file = open(self.wpath, 'wb')
+
+            world_file = self.worldpath.open('wb')
+
             writelines_list = []
             line_counter = 0
+
             for index, stuff in np.ndenumerate(np.zeros((8, 8))):
                 index_x, index_z = index[0] - 4, index[1] - 4
                 coords_list = (index_x, index_z)
@@ -35,7 +41,7 @@ class world:
         else:
             sys.stdout.write("Loading existing world...")
             sys.stdout.flush()
-        with open(self.wpath, 'r') as wdata:
+        with self.worldpath.open('r') as wdata:
             wlines = wdata.readlines()
             self.chunk_dict = loads(wlines[0])
             self.world_lines = wlines[1:]

@@ -1,12 +1,16 @@
+import sys, os
+from pathlib import Path
+sys.path.append(Path(os.path.abspath(os.path.dirname(sys.argv[0]))))
+
+if not (Path() / "setup.log").exists():
+    import setup
+    setup.install_packages()
+
 import glfw
 import glm
 import numpy as np
 from OpenGL.GL import *
 from math import sin, cos
-
-import sys, os
-from pathlib import Path
-sys.path.append(Path(os.path.abspath(os.path.dirname(sys.argv[0]))))
 from packages import utilities, chunk, render, world_gen, model
 
 rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
@@ -44,13 +48,13 @@ def main():
     crosshair = np.array([
       0.0, 0.0, 0.0], dtype = 'float32')
 
-    shader_program_scene = utilities.shader(vertex_source_3d, fragment_source_3d, '450')
+    shader_program_scene = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
     shader_program_scene.compile()
 
-    shader_program_hud = utilities.shader(vertex_source_GUI, fragment_source_GUI, '450')
+    shader_program_hud = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
     shader_program_hud.compile()
 
-    shader_program_sky = utilities.shader(vertex_source_sky, fragment_source_sky, '450')
+    shader_program_sky = utilities.shader(vertex_source_sky, fragment_source_sky, '330')
     shader_program_sky.compile()
 
     sky = np.array([
