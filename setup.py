@@ -9,6 +9,7 @@ def install_packages():
         for i in module_dict:
             try:
                 importlib.import_module(i)
+                setup.write("existing: ", module_dict[i], "\n")
             except ImportError:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", module_dict[i]])
-            setup.write(module_dict[i] + "\n")
+                setup.write("installed: ", module_dict[i] + "\n")
