@@ -9,7 +9,11 @@ def install_packages():
         for i in module_dict:
             try:
                 importlib.import_module(i)
-                setup.write("existing: ", module_dict[i], "\n")
+                setup.write("existing: " + module_dict[i] + "\n")
             except ImportError:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", module_dict[i]])
-                setup.write("installed: ", module_dict[i] + "\n")
+                if sys.platform == "linux":
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", module_dict[i]])
+                    setup.write("installed: " + module_dict[i] + "\n")
+                elif sys.platform == "win32":
+                    subprocess.check_call(["python", "-m", "pip", "install", module_dict[i]])
+                    setup.write("installed: " + module_dict[i] + "\n")

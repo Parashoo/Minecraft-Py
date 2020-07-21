@@ -22,6 +22,7 @@ class chunk:
             self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint32')
     def return_exposed(self, corner):
         empty_chunk_layer = np.zeros((16,16), dtype = 'uint8')
+        self.top_block_layer = 0
         for i in range(256):
             if not np.all(self.data[:16,255-i,:16] == empty_chunk_layer):
                 self.top_block_layer = 255-i
