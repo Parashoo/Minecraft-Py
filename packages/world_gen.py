@@ -31,7 +31,7 @@ class world:
                 index_x, index_z = index[0] - 4, index[1] - 4
                 coords_list = (index_x, index_z)
                 new_chunk = chunk.chunk()
-                new_chunk.fill_layers(0, random.randint(1, 16), 3)
+                new_chunk.fill_layers(0, 16, 5)
                 writelines_list.append(new_chunk.data.tostring()+'\n'.encode('utf-8'))
                 chunk_dict[str(coords_list)] = line_counter
                 line_counter += 1
@@ -58,15 +58,15 @@ class world:
         exposed_blocks = []
         for chunk_corner_str, line in self.chunk_dict.items():
             chunk_corner = eval(chunk_corner_str)
-            neighbour_lines = {
-                    'north': (chunk_corner[0], chunk_corner[1]+1),
-                    'south': (chunk_corner[0], chunk_corner[1]-1),
-                    'east': (chunk_corner[0]+1, chunk_corner[1]),
-                    'west': (chunk_corner[0]-1, chunk_corner[1])}
+            neighbour_chunk_lines = [
+                    (chunk_corner[0], chunk_corner[1]+1),
+                    (chunk_corner[0], chunk_corner[1]-1),
+                    (chunk_corner[0]+1, chunk_corner[1]),
+                    (chunk_corner[0]-1, chunk_corner[1])]
             neighbours = []
-            for direction in neighbour_lines:
+            for neighbour_chunk in neighbour_chunk_lines:
                 try:
-                    neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[str(neighbour_lines[direction])]][:-1]))
+                    neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[str(neighbour_chunk)]][:-1]))
                 except KeyError:
                     neighbours.append(np.zeros((18, 257, 18), dtype = 'uint8'))
             target = chunk.chunk()

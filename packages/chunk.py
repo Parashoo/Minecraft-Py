@@ -4,7 +4,6 @@ class chunk:
     faces = ['east', 'west', 'top', 'bottom', 'north', 'south']
     def __init__(self):
         self.data = np.zeros((18, 257, 18), dtype = 'uint8')
-        self.remarkable = {'top_non_air_layer': 0}
 
     def load_data(self, string):
         raw_data = np.fromstring(bytes(string, 'utf-8'), dtype = 'uint8')
@@ -12,27 +11,24 @@ class chunk:
 
     def load_neighbours(self, neighbours):        
         north_chunk, south_chunk, east_chunk, west_chunk = neighbours
-        self.data[:,:,16] = north_chunk[:,:,1]
-        self.data[:,:,-1] = south_chunk[:,:,15]
+        self.data[:,:,16] = north_chunk[:,:,0]
+        self.data[:,:,17] = south_chunk[:,:,15]
         self.data[16,:,:] = east_chunk[0,:,:]
-        self.data[-1,:,:] = west_chunk[15,:,:]
-        self.data[:,-1,:] = np.zeros((18, 18), dtype = 'uint8')
+        self.data[17,:,:] = west_chunk[15,:,:]
+        self.data[:,256,:] = np.zeros((18, 18), dtype = 'uint8')
 
     def fill_layers(self, bottom_layer, top_layer, block_type):
         for i in range(top_layer - bottom_layer):
             self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint32')
-    def find_highest_non_transparent(self):
+    def return_exposed(self, corner):
         empty_chunk_layer = np.zeros((16,16), dtype = 'uint8')
         for i in range(256):
-            if not np.all(self.data[:,255-i,:] == empty_chunk_layer):
-                self.remarkable['top_non_air_layer'] = 255-i
-                return 255 - i
+            if not np.all(self.data[:16,255-i,:16] == empty_chunk_layer):
+                self.top_block_layer = 255-i
                 break
             else: pass
-    def return_exposed(self, corner):
         exposed_list = []
-        for coords, blocktype in np.ndenumerate(self.data[0:15, 0:self.find_highest_non_transparent(), 0:15]):
-            print(coords)
+        for coords, blocktype in np.ndenumerate(self.data[0:16, 0:self.top_block_layer+1, 0:16]):
             x, y, z = coords
             if blocktype == 0:
                 pass
