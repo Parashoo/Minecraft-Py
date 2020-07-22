@@ -51,6 +51,34 @@ class world:
         elapsed = time() - now
         self.time_required = [elapsed]
 
+    def return_chunk_vaos(self, layer_list, model_list):
+        chunk_vao_list = []
+        chunk_size_list = []
+        for chunk_corner_str, chunk_line in self.chunk_dict.items():
+            ch = chunk.chunk()
+            chunk_corner = eval(chunk_corner_str)
+            ch.load_data(self.world_lines[chunk_line][:-1], chunk_corner)
+            ch.load_neighbours(self.return_neighbours(chunk_corner))
+            chunk_vbo, chunk_vao, chunk_size = ch.chunk_render(layer_list, model_list)
+            chunk_vao_list.append(chunk_vao)
+            chunk_size_list.append(chunk_size)
+        return chunk_vao_list, chunk_size_list
+
+    def return_neighbours(self, corner):
+        neighbour_chunk_corners = [
+            (corner[0], corner[1] + 1),
+            (corner[0], corner[1] - 1),
+            (corner[0] + 1, corner[1]),
+            (corner[0] - 1, corner[1])]
+        neighbours = []
+        for neighbour_corner in neighbour_chunk_corners:
+            try:
+                neighbours.append(chunk.return_chunk_data(corner, self.world_lines[self.chunk_dict[str(neighbour_corner)]][:-1]))
+            except KeyError:
+                neighbours.append(np.zeros((18, 257, 18), dtype = 'uint8'))
+
+        return neighbours
+    
     def return_all_exposed(self):
         now = time()
         sys.stdout.write("Calculating exposed blocks... ")
@@ -63,16 +91,11 @@ class world:
                     (chunk_corner[0], chunk_corner[1]-1),
                     (chunk_corner[0]+1, chunk_corner[1]),
                     (chunk_corner[0]-1, chunk_corner[1])]
-            neighbours = []
-            for neighbour_chunk in neighbour_chunk_lines:
-                try:
-                    neighbours.append(chunk.return_chunk_data(self.world_lines[self.chunk_dict[str(neighbour_chunk)]][:-1]))
-                except KeyError:
-                    neighbours.append(np.zeros((18, 257, 18), dtype = 'uint8'))
+            neighbours = self.return_neighbours(chunk_corner)
             target = chunk.chunk()
-            target.load_data(self.world_lines[line][:-1])
+            target.load_data(self.world_lines[line][:-1], chunk_corner)
             target.load_neighbours(neighbours)
-            exposed_blocks = exposed_blocks + target.return_exposed(chunk_corner)
+            exposed_blocks = exposed_blocks + target.return_exposed()
         elapsed = time() - now
         sys.stdout.write("Done\n")
         sys.stdout.flush()

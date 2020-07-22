@@ -103,8 +103,8 @@ def main():
     all_textures, layers = render.load_all_block_textures(blocktexturepath)
     all_models = model.load_all(rootpath)
 
-    print(len(exposed_list))
-    world_render = render.render(exposed_list, layers, all_models)
+    chunk_vaos, chunk_sizes = test_world.return_chunk_vaos(layers, all_models)
+    world_render = render.render(layers, all_models, all_textures, shader_program_scene)
 
     while not window.check_if_closed():
 
@@ -136,12 +136,12 @@ def main():
         shader_program_scene.set_mat4('projection', glm.value_ptr(projection))
 
         glEnable(GL_DEPTH_TEST)
-        world_render.draw_buffer(shader_program_scene, all_textures)
-        if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
-            world_render.update_buffer(camera)
-
+#      if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
+#          world_render.draw_and_update(shader_program_scene, all_textures)
+#      else:
+#          world_render.draw_buffer(shader_program_scene, all_textures)
+        world_render.draw_from_chunks(chunk_vaos, chunk_sizes)
         glBindVertexArray(0)
-
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, crosshair_texture_ID)

@@ -2,7 +2,7 @@ import subprocess
 import importlib
 import sys
 
-module_dict = {"OpenGL": "PyOpenGL", "glfw": "glfw", "numpy": "numpy", "glm": "PyGLM", "PIL": "Pillow"}
+module_dict = {"OpenGL": "PyOpenGL", "glfw": "glfw", "PIL": "Pillow", "numpy": "numpy", "glm": "PyGLM"}
 
 def install_packages():
     with open("setup.log", "w") as setup:
