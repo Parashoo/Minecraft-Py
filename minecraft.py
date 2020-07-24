@@ -102,7 +102,7 @@ def main():
     all_models = model.load_all(rootpath)
 
     world_render = render.render(layers, all_models, all_textures, shader_program_scene)
-    all_chunks = test_world.return_all_chunk_data()
+    all_chunks = test_world.return_all_chunks()
     chunk_arrays, chunk_sizes = world_render.create_buffers_from_chunks(all_chunks) 
 
     while not window.check_if_closed():
@@ -134,11 +134,9 @@ def main():
         shader_program_scene.set_mat4('view', glm.value_ptr(view))
         shader_program_scene.set_mat4('projection', glm.value_ptr(projection))
 
+        if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
+            test_world.return_chunk_containing_block([int(i) for i in pos]).toggle_block_type().update_associated_VBO(world_render)
         glEnable(GL_DEPTH_TEST)
-#      if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
-#          world_render.draw_and_update(shader_program_scene, all_textures)
-#      else:
-#          world_render.draw_buffer(shader_program_scene, all_textures)
         world_render.draw_from_chunks(chunk_arrays, chunk_sizes)
         glBindVertexArray(0)
 

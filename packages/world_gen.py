@@ -51,11 +51,18 @@ class world:
         elapsed = time() - now
         self.time_required = [elapsed]
 
-    def return_all_chunk_data(self):
+    def return_all_chunks(self):
+        sys.stdout.write("Calculating exposed blocks... ")
+        sys.stdout.flush()
         now = time()
-        chunk_data_list = [chunk.chunk().load_data(self.world_lines[chunk_line][:-1], eval(chunk_corner_str)).load_neighbours(self.return_neighbours(eval(chunk_corner_str))).return_exposed() for chunk_corner_str, chunk_line in self.chunk_dict.items()]
+        self.chunk_pointer_dict = {}
+        self.chunk_list = []
+        for index, chunk_info in enumerate(self.chunk_dict.items()):
+            self.chunk_list.append(chunk.chunk().load_data(self.world_lines[chunk_info[1]][:-1], eval(chunk_info[0])).load_neighbours(self.return_neighbours(eval(chunk_info[0]))).return_exposed())
+            self.chunk_pointer_dict[eval(chunk_info[0])] = index
         self.time_required.append(time() - now)
-        return chunk_data_list
+        sys.stdout.write("Done\n")
+        return self.chunk_list
 
     def return_neighbours(self, corner):
         neighbour_chunk_corners = [
@@ -72,6 +79,10 @@ class world:
 
         return neighbours
     
+    def return_chunk_containing_block(self, coords):
+        corner = (coords[0] // 16, coords[2] // 16)
+        return self.chunk_list[self.chunk_pointer_dict[corner]]
+        
     def return_all_exposed(self):
         now = time()
         sys.stdout.write("Calculating exposed blocks... ")

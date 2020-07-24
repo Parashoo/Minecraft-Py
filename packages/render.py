@@ -8,6 +8,9 @@ from OpenGL.GL import *
 import time
 
 class render:
+    """
+    Class that manages VBO and VAO creation, as well as drawing these.
+    """
     faces = {
             "south": [
               0.0,  0.0,  0.0,  1.0, 1.0,
@@ -59,12 +62,20 @@ class render:
              }
 
     def __init__(self, layer_list, model_list, texture, program):
+        """
+        Initialization of a render class.
+        Required arguments:
+            - layer_list: a list containing pointers for the GL_TEXTURE_2D_ARRAY's layers.
+            - model_list: a list containing block models.
+            - texture: a pointer to the GL_TEXTURE_2D_ARRAY mentioned above.
+            - program: the shader program to be used.
+        """
         self.layer_list = layer_list
         self.model_list = model_list
         self.texture = texture
         self.program = program
 
-    def create_buffer(self, data):
+    def generate_vertex_data(self, data):
         render_list = []
         for i in data:
             render_list.append([
@@ -74,6 +85,15 @@ class render:
                 render.faces[i[4]][15],  render.faces[i[4]][16],  render.faces[i[4]][17],  render.faces[i[4]][18], render.faces[i[4]][19], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
                 render.faces[i[4]][20],  render.faces[i[4]][21],  render.faces[i[4]][22],  render.faces[i[4]][23], render.faces[i[4]][24], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
                 render.faces[i[4]][25],  render.faces[i[4]][26],  render.faces[i[4]][27],  render.faces[i[4]][28], render.faces[i[4]][29], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]]])
+        return render_list
+
+    def create_buffer(self, data):
+        """
+        Create a VBO and a VAO for the data passed as argument.
+        data should be a list of faces and coordinates structured as returned by chunk.return_neighbours().
+        Returns pointers to the buffer and array created, as well as the size of the buffer created (for drawing purposes).
+        """
+        render_list = self.generate_vertex_data(data)
         vbo, vao = glGenBuffers(1), glGenVertexArrays(1)
         glBindVertexArray(vao)
         glBindBuffer(GL_ARRAY_BUFFER, vbo)
@@ -97,16 +117,28 @@ class render:
         sys.stdout.flush()
         self.time_required = time.time() - now
     
-    def create_buffers_from_chunks(self, data_list):
-        vbo_list, vao_list, sizes_list = [], [], []
+    def create_buffers_from_chunks(self, chunk_list):
+        self.vbo_list, self.vao_list, self.sizes_list = [], [], []
+        sys.stdout.write("Creating buffers... ")
+        sys.stdout.flush()
         now = time.time()
-        for data in data_list:
-            new_vbo, new_vao, new_size = self.create_buffer(data)
-            vbo_list.append(new_vbo)
-            vao_list.append(new_vao)
-            sizes_list.append(new_size)
+        for index, chunk in enumerate(chunk_list):
+            new_vbo, new_vao, new_size = self.create_buffer(chunk.exposed_list)
+            self.vbo_list.append(new_vbo)
+            self.vao_list.append(new_vao)
+            self.sizes_list.append(new_size)
+            chunk.GL_pointer = index
         self.time_required = time.time() - now
-        return vao_list, sizes_list
+        sys.stdout.write("Done\n")
+        sys.stdout.flush()
+        return self.vao_list, self.sizes_list
+    
+    def update_buffer(self, pointer, new_data):
+        glBindVertexArray(self.vao_list[pointer])
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_list[pointer])
+        new_data = self.generate_vertex_data(new_data)
+        glBufferData(GL_ARRAY_BUFFER, np.full(np.size(new_data)*4, None), GL_DYNAMIC_DRAW)
+        glBufferSubData(GL_ARRAY_BUFFER, 0, np.size(new_data)*4, np.array(new_data))
         
     def draw_from_chunks(self, array_list, size_list):
         for index, array in enumerate(array_list):
@@ -115,7 +147,7 @@ class render:
             glBindVertexArray(array)
             glDrawArrays(GL_TRIANGLES, 0, size_list[index])
 
-    def draw_buffer(self):
+    def draw_buffer(self): ### DEPRECATED ###
         self.program.use()
         glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture)
         glBindVertexArray(self.render_vao)
