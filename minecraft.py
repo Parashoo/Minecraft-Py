@@ -88,8 +88,6 @@ def main():
     crosshair_texture = utilities.texture(texturepath / "icons.png", crop = (0,0,16,16))
     crosshair_texture_ID = crosshair_texture.gen_texture()
 
-    exposed_list = test_world.return_all_exposed()
-
     shader_program_scene.use()
     shader_program_scene.set_int('texture0', 0)
 
@@ -103,8 +101,9 @@ def main():
     all_textures, layers = render.load_all_block_textures(blocktexturepath)
     all_models = model.load_all(rootpath)
 
-    chunk_vaos, chunk_sizes = test_world.return_chunk_vaos(layers, all_models)
     world_render = render.render(layers, all_models, all_textures, shader_program_scene)
+    all_chunks = test_world.return_all_chunk_data()
+    chunk_arrays, chunk_sizes = world_render.create_buffers_from_chunks(all_chunks) 
 
     while not window.check_if_closed():
 
@@ -140,7 +139,7 @@ def main():
 #          world_render.draw_and_update(shader_program_scene, all_textures)
 #      else:
 #          world_render.draw_buffer(shader_program_scene, all_textures)
-        world_render.draw_from_chunks(chunk_vaos, chunk_sizes)
+        world_render.draw_from_chunks(chunk_arrays, chunk_sizes)
         glBindVertexArray(0)
 
         glActiveTexture(GL_TEXTURE0)

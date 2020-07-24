@@ -51,18 +51,11 @@ class world:
         elapsed = time() - now
         self.time_required = [elapsed]
 
-    def return_chunk_vaos(self, layer_list, model_list):
-        chunk_vao_list = []
-        chunk_size_list = []
-        for chunk_corner_str, chunk_line in self.chunk_dict.items():
-            ch = chunk.chunk()
-            chunk_corner = eval(chunk_corner_str)
-            ch.load_data(self.world_lines[chunk_line][:-1], chunk_corner)
-            ch.load_neighbours(self.return_neighbours(chunk_corner))
-            chunk_vbo, chunk_vao, chunk_size = ch.chunk_render(layer_list, model_list)
-            chunk_vao_list.append(chunk_vao)
-            chunk_size_list.append(chunk_size)
-        return chunk_vao_list, chunk_size_list
+    def return_all_chunk_data(self):
+        now = time()
+        chunk_data_list = [chunk.chunk().load_data(self.world_lines[chunk_line][:-1], eval(chunk_corner_str)).load_neighbours(self.return_neighbours(eval(chunk_corner_str))).return_exposed() for chunk_corner_str, chunk_line in self.chunk_dict.items()]
+        self.time_required.append(time() - now)
+        return chunk_data_list
 
     def return_neighbours(self, corner):
         neighbour_chunk_corners = [
