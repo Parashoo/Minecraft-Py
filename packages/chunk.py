@@ -1,12 +1,20 @@
 import numpy as np
 import time
+import random
 
 class chunk:
     faces = ['east', 'west', 'top', 'bottom', 'north', 'south']
-    def __init__(self):
-        self.data = np.zeros((18, 257, 18), dtype = 'uint8')
-        self.GL_pointer = 0
-        self.blocktype = 5
+    def __init__(self, *args, gen=False):
+        if gen:
+            self.data = np.zeros((18, 257, 18), dtype="uint8")
+            self.fill_layers(0, random.randint(0, 16), 5)
+        else:
+            world = args[0]
+            self.corner = args[1]
+            self.data = world.return_chunk_data(self.corner)
+            self.data[:,:,16], self.data[:,:,17], self.data[16,:,:], self.data[17,:,:] = world.return_neighbour_slices(self.corner)
+            self.GL_pointer = 0
+            self.blocktype = 5
 
     def load_data(self, string, corner):
         raw_data = np.fromstring(bytes(string, 'utf-8'), dtype = 'uint8')
@@ -25,7 +33,7 @@ class chunk:
 
     def fill_layers(self, bottom_layer, top_layer, block_type):
         for i in range(top_layer - bottom_layer):
-            self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint32')
+            self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint8')
     
     def toggle_block_type(self):
         if self.blocktype == 5: self.blocktype = 3

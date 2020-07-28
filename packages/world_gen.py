@@ -30,8 +30,7 @@ class world:
             for index, stuff in np.ndenumerate(np.zeros((8, 8))):
                 index_x, index_z = index[0] - 4, index[1] - 4
                 coords_list = (index_x, index_z)
-                new_chunk = chunk.chunk()
-                new_chunk.fill_layers(0, random.randint(1, 16), 3)
+                new_chunk = chunk.chunk(gen=True)
                 writelines_list.append(new_chunk.data.tostring()+'\n'.encode('utf-8'))
                 chunk_dict[str(coords_list)] = line_counter
                 line_counter += 1
@@ -50,6 +49,17 @@ class world:
 
         elapsed = time() - now
         self.time_required = [elapsed]
+        
+    def return_chunk_data(self, corner):
+        return np.fromstring(bytes(self.world_lines[self.chunk_dict[str(corner)]][:-1], 'utf-8'), dtype='uint8').reshape(18, 257, 18)
+       
+    def return_neighbour_slices(self, corner):
+        return [
+          self.return_chunk_data((corner[0], corner[1] + 1))[:,:,0],
+          self.return_chunk_data((corner[0], corner[1] - 1))[:,:,15],
+          self.return_chunk_data((corner[0] + 1, corner[1]))[0,:,:],
+          self.return_chunk_data((corner[0] - 1, corner[1]))[15,:,:]
+        ]
 
     def return_all_chunks(self):
         sys.stdout.write("Calculating exposed blocks... ")
@@ -58,7 +68,7 @@ class world:
         self.chunk_pointer_dict = {}
         self.chunk_list = []
         for index, chunk_info in enumerate(self.chunk_dict.items()):
-            self.chunk_list.append(chunk.chunk().load_data(self.world_lines[chunk_info[1]][:-1], eval(chunk_info[0])).load_neighbours(self.return_neighbours(eval(chunk_info[0]))).return_exposed())
+            self.chunk_list.append(chunk.chunk(self, eval(chunk_info[0])).return_exposed())
             self.chunk_pointer_dict[eval(chunk_info[0])] = index
         self.time_required.append(time() - now)
         sys.stdout.write("Done\n")
