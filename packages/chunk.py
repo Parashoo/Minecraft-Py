@@ -7,29 +7,17 @@ class chunk:
     def __init__(self, *args, gen=False):
         if gen:
             self.data = np.zeros((18, 257, 18), dtype="uint8")
-            self.fill_layers(0, random.randint(0, 16), 5)
+            height = random.randint(1, 16)
+            self.data[17, 0, 17] = height
+            self.fill_layers(0, height, 3)
         else:
             world = args[0]
             self.corner = args[1]
             self.data = world.return_chunk_data(self.corner)
-            self.data[:,:,16], self.data[:,:,17], self.data[16,:,:], self.data[17,:,:] = world.return_neighbour_slices(self.corner)
+            self.data[:16,:,16], self.data[:16,:,17], self.data[16,:,:16], self.data[17,:,:16] = world.return_neighbour_slices(self.corner)
+            self.height = self.data[17, 0, 17]
             self.GL_pointer = 0
             self.blocktype = 5
-
-    def load_data(self, string, corner):
-        raw_data = np.fromstring(bytes(string, 'utf-8'), dtype = 'uint8')
-        self.data = raw_data.reshape(18, 257, 18)
-        self.corner = corner
-        return self
-
-    def load_neighbours(self, neighbours):
-        north_chunk, south_chunk, east_chunk, west_chunk = neighbours
-        self.data[:,:,16] = north_chunk[:,:,0]
-        self.data[:,:,17] = south_chunk[:,:,15]
-        self.data[16,:,:] = east_chunk[0,:,:]
-        self.data[17,:,:] = west_chunk[15,:,:]
-        self.data[:,256,:] = np.zeros((18, 18), dtype = 'uint8')
-        return self
 
     def fill_layers(self, bottom_layer, top_layer, block_type):
         for i in range(top_layer - bottom_layer):
@@ -52,12 +40,12 @@ class chunk:
             if not np.all(self.data[:16,255-i,:16] == empty_chunk_layer):
                 self.top_block_layer = 255-i
                 break
-            else: pass
+            else: continue
         self.exposed_list = []
         for coords, blocktype in np.ndenumerate(self.data[0:16, 0:self.top_block_layer+1, 0:16]):
             x, y, z = coords
             if blocktype == 0:
-                pass
+                continue    
             coords_in_world = (x+16*self.corner[0], y, z+16*self.corner[1])
             neighbours = [self.data[x+1, y, z],
                           self.data[x-1, y, z],
