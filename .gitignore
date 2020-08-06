@@ -3,5 +3,10 @@
 *.world
 *.save
 *.pyc
+*.swp
+*.swp~
+*.un
+*.py~
+*.un~
 README.md
 setup.log
