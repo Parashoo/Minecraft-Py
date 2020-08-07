@@ -135,7 +135,7 @@ def main():
         shader_program_scene.set_mat4('projection', glm.value_ptr(projection))
 
         if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
-            test_world.return_chunk_containing_block([int(i) for i in pos]).toggle_block_type().update_associated_VBO(world_render)
+            test_world.return_chunk_containing_block([int(i) for i in pos]).update_associated_VBO(world_render)
         glEnable(GL_DEPTH_TEST)
         world_render.draw_from_chunks(chunk_arrays, chunk_sizes)
         glBindVertexArray(0)

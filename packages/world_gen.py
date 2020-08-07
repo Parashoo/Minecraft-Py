@@ -54,12 +54,17 @@ class world:
         return np.fromstring(bytes(self.world_lines[self.chunk_dict[str(corner)]][:-1], 'utf-8'), dtype='uint8').reshape(18, 257, 18)
        
     def return_neighbour_slices(self, corner):
-        return [
-          self.return_chunk_data((corner[0], corner[1] + 1))[:,:,0],
-          self.return_chunk_data((corner[0], corner[1] - 1))[:,:,15],
-          self.return_chunk_data((corner[0] + 1, corner[1]))[0,:,:],
-          self.return_chunk_data((corner[0] - 1, corner[1]))[15,:,:]
-        ]
+        neighbour_corners = [((corner[0], corner[1] + 1), (slice(None), slice(None), 0)),
+                             ((corner[0], corner[1] - 1), (slice(None), slice(None), 15)),
+                             ((corner[0] + 1, corner[1]), (0, slice(None), slice(None))),
+                             ((corner[0] - 1, corner[1]), (15, slice(None), slice(None)))]
+        neighbour_slices = []
+        for neighbour_corner in neighbour_corners:
+            if str(neighbour_corner[0]) in self.chunk_dict.keys():
+                neighbour_slices.append(self.return_chunk_data(neighbour_corner[0])[neighbour_corner[1]])
+            else:
+                neighbour_slices.append(np.zeros((18, 257, 18), dtype = "uint8")[neighbour_corner[1]])
+        return neighbour_slices
 
     def return_all_chunks(self):
         sys.stdout.write("Calculating exposed blocks... ")
