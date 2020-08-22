@@ -54,6 +54,8 @@ class chunk:
 
     def update_associated_VBO(self, renderer):
         print("Updating buffer with pointer ", self.GL_pointer)
+        self.toggle_block_type()
+        print(self.blocktype)
         renderer.update_buffer(self.GL_pointer, self.exposed_list)
 
 def return_chunk_data(corner, data_string):

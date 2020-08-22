@@ -37,7 +37,7 @@ def main():
     global delta_time, last_frame
 
     fps_list = []
-    test_world = world_gen.world('__DELETEME__', '-o')
+    test_world = world_gen.world('__DELETEME__', '-o', '-t')
     window = utilities.window()
     camera.setup_window(window)
 

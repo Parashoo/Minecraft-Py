@@ -13,6 +13,9 @@ class world:
         worlddir = rootpath / "world"
         now = time()
         self.world_mode = 'Loading existing world: '
+        world_shape = (8, 8)
+        if '-t' in options:
+            world_shape = (1, 1)
         if not worlddir.exists():
             worlddir.mkdir()
         self.worldpath = worlddir / (worldname+".world")
@@ -27,8 +30,8 @@ class world:
             writelines_list = []
             line_counter = 0
 
-            for index, stuff in np.ndenumerate(np.zeros((8, 8))):
-                index_x, index_z = index[0] - 4, index[1] - 4
+            for index, stuff in np.ndenumerate(np.zeros(world_shape)):
+                index_x, index_z = index[0] - round(world_shape[0]/2), index[1] - round(world_shape[1]/2)
                 coords_list = (index_x, index_z)
                 new_chunk = chunk.chunk(gen=True)
                 writelines_list.append(new_chunk.data.tostring()+'\n'.encode('utf-8'))
