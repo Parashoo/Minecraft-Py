@@ -106,7 +106,6 @@ class render:
         glEnableVertexAttribArray(2)
         glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(32)) # Texture array index
         glEnableVertexAttribArray(3)
-        print(render_list.flatten()[:9], glGetBufferSubData(GL_ARRAY_BUFFER, 0, glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE)).view(dtype="float32")[:9])
         return vbo, vao, len(render_list) * 6, render_list
        
     def create_buffers_from_world(self, coords_list):
@@ -130,7 +129,6 @@ class render:
             self.sizes_list.append(new_size)
             self.data_list.append(new_render_list)
             chunk.GL_pointer = index
-        print(self.data_list[0].flatten(), glGetBufferSubData(GL_ARRAY_BUFFER, 0, glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE)))
 
         self.time_required = time.time() - now
         sys.stdout.write("Done\n")
@@ -138,11 +136,12 @@ class render:
         return self.vao_list, self.sizes_list
     
     def update_buffer(self, pointer, new_data):
-        glBindVertexArray(self.vao_list[0])
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_list[0])
+        glBindVertexArray(self.vao_list[pointer])
+        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_list[pointer])
         draw_data = self.generate_vertex_data(new_data)
-        glInvalidateBufferSubData(self.vbo_list[0], 0, glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE))
-        glBufferSubData(GL_ARRAY_BUFFER, 0, np.size(new_data), np.array(draw_data).view(dtype="uint8"))
+        draw_data.dtype = "uint8"
+        #glInvalidateBufferSubData(self.vbo_list[0], 0, glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE))
+        glBufferData(GL_ARRAY_BUFFER, np.array(draw_data), GL_DYNAMIC_DRAW)
 
     def draw_from_chunks(self, array_list, size_list):
         for index, array in enumerate(array_list):

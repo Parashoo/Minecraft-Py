@@ -23,7 +23,8 @@ class chunk:
     def toggle_block_type(self):
         if self.blocktype == 5: self.blocktype = 3
         else: self.blocktype = 5
-        self.exposed_list = [face[:3]+(self.blocktype,)+(face[4],) for face in self.exposed_list]
+        for index, face in enumerate(self.exposed_list):
+            self.exposed_list[index] = face[:3]+(self.blocktype,)+(face[4],)
         return self
 
     def return_exposed(self):
@@ -55,7 +56,6 @@ class chunk:
     def update_associated_VBO(self, renderer):
         print("Updating buffer with pointer ", self.GL_pointer)
         self.toggle_block_type()
-        print(self.blocktype)
         renderer.update_buffer(self.GL_pointer, self.exposed_list)
 
 def return_chunk_data(corner, data_string):
