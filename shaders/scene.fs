@@ -1,4 +1,4 @@
-#version %s core
+#version 330 core
 
 in vec2 TexCoord;
 flat in int texLayer;

@@ -7,7 +7,7 @@ class chunk:
     def __init__(self, *args, gen=False):
         if gen:
             self.data = np.zeros((18, 257, 18), dtype="uint8")
-            self.fill_layers(0, random.randint(0, 16), 5)
+            self.fill_layers(0, random.randint(0, 16), 3)
         else:
             world = args[0]
             self.corner = args[1]
@@ -20,13 +20,29 @@ class chunk:
         for i in range(top_layer - bottom_layer):
             self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint8')
     
-    def toggle_block_type(self):
-        if self.blocktype == 5: self.blocktype = 3
-        else: self.blocktype = 5
-        for index, face in enumerate(self.exposed_list):
-            self.exposed_list[index] = face[:3]+(self.blocktype,)+(face[4],)
-        return self
-
+    def add_remove_faces(self, coords, blocktype, renderer):
+        now = time.time()
+        self.data[coords] = blocktype
+        x, y, z = coords[0], coords[1], coords[2]
+        coords_in_world = (x+16*self.corner[0], y, z+16*self.corner[1])
+        neighbours = [self.data[x+1, y, z],
+                      self.data[x-1, y, z],
+                      self.data[x, y+1, z],
+                      self.data[x, y-1, z],
+                      self.data[x, y, z+1],
+                      self.data[x, y, z-1]]
+        for i in neighbours:
+            face = coords_in_world + (blocktype,) + (chunk.faces[i],)
+            if i != 0 and face in self.exposed_list:
+                self.exposed_list.remove(face)
+                continue
+            if i == 0 and face not in self.exposed_list:
+                self.exposed_list.append(face)
+                continue
+        elapsed = time.time() - now
+        print("Editing exposed_list: ", elapsed)
+        self.update_associated_VBO(renderer)
+ 
     def return_exposed(self):
         empty_chunk_layer = np.zeros((16,16), dtype = 'uint8')
         self.top_block_layer = 0
@@ -55,7 +71,7 @@ class chunk:
 
     def update_associated_VBO(self, renderer):
         print("Updating buffer with pointer ", self.GL_pointer)
-        self.toggle_block_type()
+        self.return_exposed()
         renderer.update_buffer(self.GL_pointer, self.exposed_list)
 
 def return_chunk_data(corner, data_string):

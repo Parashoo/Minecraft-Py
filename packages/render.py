@@ -6,6 +6,7 @@ from PIL import Image
 from pathlib import Path
 from OpenGL.GL import *
 import time
+import ctypes
 
 class render:
     """
@@ -61,7 +62,7 @@ class render:
               0.0,  1.0,  0.0,  0.0, 1.0]
              }
 
-    def __init__(self, layer_list, model_list, texture, program):
+    def __init__(self, layer_list, model_list, texture, program, context):
         """
         Initialization of a render class.
         Required arguments:
@@ -74,6 +75,8 @@ class render:
         self.model_list = model_list
         self.texture = texture
         self.program = program
+        self.context = context
+        self.previous_draw_data = np.array([], dtype = "float32")
 
     def generate_vertex_data(self, data):
         render_list = []
@@ -94,19 +97,10 @@ class render:
         Returns pointers to the buffer and array created, as well as the size of the buffer created (for drawing purposes).
         """
         render_list = self.generate_vertex_data(data)
-        vbo, vao = glGenBuffers(1), glGenVertexArrays(1)
-        glBindVertexArray(vao)
-        glBindBuffer(GL_ARRAY_BUFFER, vbo)
-        glBufferData(GL_ARRAY_BUFFER, render_list, GL_STREAM_DRAW)
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(0)) # Model space
-        glEnableVertexAttribArray(0)
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(12)) # Texture coordinates
-        glEnableVertexAttribArray(1)
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(20)) # World space
-        glEnableVertexAttribArray(2)
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 36, ctypes.c_void_p(32)) # Texture array index
-        glEnableVertexAttribArray(3)
-        return vbo, vao, len(render_list) * 6, render_list
+        print(self.program._members)
+        vbo = self.context.buffer(render_list.tobytes())
+        vao = self.context.vertex_array(self.program, [(vbo, "3f4 2f4 3f4 1f4 /v", "aPos", "aTexCoords", "cube_coord", "blockType")])            
+        return vbo, vao
        
     def create_buffers_from_world(self, coords_list):
         sys.stdout.write("Creating render buffer... ")
@@ -118,37 +112,32 @@ class render:
         self.time_required = time.time() - now
     
     def create_buffers_from_chunks(self, chunk_list):
-        self.vbo_list, self.vao_list, self.sizes_list, self.data_list = [], [], [], []
+        self.vbo_list, self.vao_list = [], []
         sys.stdout.write("Creating buffers... ")
         sys.stdout.flush()
         now = time.time()
         for index, chunk in enumerate(chunk_list):
-            new_vbo, new_vao, new_size, new_render_list = self.create_buffer(chunk.exposed_list)
+            new_vbo, new_vao = self.create_buffer(chunk.exposed_list)
             self.vbo_list.append(new_vbo)
             self.vao_list.append(new_vao)
-            self.sizes_list.append(new_size)
-            self.data_list.append(new_render_list)
-            chunk.GL_pointer = index
-
         self.time_required = time.time() - now
         sys.stdout.write("Done\n")
         sys.stdout.flush()
         return self.vao_list, self.sizes_list
-    
+
     def update_buffer(self, pointer, new_data):
-        glBindVertexArray(self.vao_list[pointer])
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo_list[pointer])
-        draw_data = self.generate_vertex_data(new_data)
-        draw_data.dtype = "uint8"
-        #glInvalidateBufferSubData(self.vbo_list[0], 0, glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE))
-        glBufferData(GL_ARRAY_BUFFER, np.array(draw_data), GL_DYNAMIC_DRAW)
+        #glBindVertexArray(self.vao_list[pointer])
+        #glBindBuffer(GL_ARRAY_BUFFER, self.vbo_list[pointer])
+        #draw_data = self.generate_vertex_data(new_data)
+        #self.sizes_list[pointer] = draw_data.nbytes
+        glBufferSubData(GL_ARRAY_BUFFER, 256, 9, None)
+        #print(draw_data.size - self.previous_draw_data.size)
+        #glBufferSubData(GL_ARRAY_BUFFER, 0, draw_data.nbytes, draw_data)
+        #self.previous_draw_data = draw_data
 
     def draw_from_chunks(self, array_list, size_list):
-        for index, array in enumerate(array_list):
-            self.program.use()
-            glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture)
-            glBindVertexArray(array)
-            glDrawArrays(GL_TRIANGLES, 0, size_list[index])
+        for index, array in enumerate(self.vao_list):
+            array.render()
 
     def draw_buffer(self): ### DEPRECATED ###
         self.program.use()
@@ -156,24 +145,15 @@ class render:
         glBindVertexArray(self.render_vao)
         glDrawArrays(GL_TRIANGLES, 0, self.render_size * 6)
 
-def load_all_block_textures(sourcepath):
+def load_all_block_textures(sourcepath, context):
+    
     layer_list = {}
-    block_tex_array = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D_ARRAY, block_tex_array)
-    glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-      3, #Max mipmap level
-      GL_RGBA8, #File format
-      16, 16, #Image size
-      20 #Layer count
-    )
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    texture_list = []
+    
     for num, texture in enumerate(sourcepath.iterdir()):
         tex_file = Image.open(texture)
-        tex_data = np.array(list(tex_file.getdata()), np.int8)
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, num, 16, 16, 1, GL_RGBA, GL_UNSIGNED_BYTE, tex_data)
+        texture_list.append(list(tex_file.getdata()))
         layer_list.update({str(texture)[len(str(sourcepath))+1:]: num})
-    glGenerateMipmap(GL_TEXTURE_2D_ARRAY)
+    texture_array_data = np.array(texture_list, dtype = "uint8")
+    block_tex_array = context.texture_array((16, 16, len(texture_list)), 4, texture_array_data)
     return block_tex_array, layer_list

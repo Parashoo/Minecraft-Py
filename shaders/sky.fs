@@ -1,4 +1,4 @@
-#version %s core
+#version 330 core
 
 in vec3 skyColor;
 

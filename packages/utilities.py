@@ -31,6 +31,13 @@ class camera:
     def setup_window(self, parent):
         glfw.set_input_mode(parent.window, glfw.CURSOR, glfw.CURSOR_DISABLED)
         glfw.set_cursor_pos_callback(parent.window, self.mouse_callback)
+    
+    def cast_ray(self):
+        ray_points = np.zeros((3, 2), dtype = "float32")
+        ray_points[:, 0] = self.pos
+        ray_points[:, 1] = self.pos + self.front * 20
+        return ray_points
+        
 
     def mouse_callback(self, parent, x, y):
         if self.first_mouse:
@@ -84,7 +91,7 @@ class camera:
 
     def testing_commands(self, parent):
         if glfw.get_key(parent.window, glfw.KEY_H) == glfw.PRESS:
-            self.pos = glm.vec3(0, 0, -3)
+            self.pos = glm.vec3(0, 0, 0)
         if glfw.get_key(parent.window, glfw.KEY_PAGE_DOWN) == glfw.PRESS:
             self.pos.y -= 50
         if glfw.get_key(parent.window, glfw.KEY_PAGE_UP) == glfw.PRESS:

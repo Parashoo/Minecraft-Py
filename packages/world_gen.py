@@ -96,33 +96,14 @@ class world:
                 neighbours.append(np.zeros((18, 257, 18), dtype = 'uint8'))
 
         return neighbours
+
+    def set_block(self, coords, blocktype, renderer):
+        target_chunk = self.return_chunk_containing_block(coords)
+        target_chunk.add_remove_faces((coords[0] % 16, coords[1], coords[2] % 16), blocktype, renderer)
     
     def return_chunk_containing_block(self, coords):
         corner = (coords[0] // 16, coords[2] // 16)
         return self.chunk_list[self.chunk_pointer_dict[corner]]
-        
-    def return_all_exposed(self):
-        now = time()
-        sys.stdout.write("Calculating exposed blocks... ")
-        sys.stdout.flush()
-        exposed_blocks = []
-        for chunk_corner_str, line in self.chunk_dict.items():
-            chunk_corner = eval(chunk_corner_str)
-            neighbour_chunk_lines = [
-                    (chunk_corner[0], chunk_corner[1]+1),
-                    (chunk_corner[0], chunk_corner[1]-1),
-                    (chunk_corner[0]+1, chunk_corner[1]),
-                    (chunk_corner[0]-1, chunk_corner[1])]
-            neighbours = self.return_neighbours(chunk_corner)
-            target = chunk.chunk()
-            target.load_data(self.world_lines[line][:-1], chunk_corner)
-            target.load_neighbours(neighbours)
-            exposed_blocks = exposed_blocks + target.return_exposed()
-        elapsed = time() - now
-        sys.stdout.write("Done\n")
-        sys.stdout.flush()
-        self.time_required.append(elapsed)
-        return exposed_blocks
 
     def return_time(self):
         return 'Exposed block calculation: {}\n{}{}'.format(self.time_required[1], self.world_mode, self.time_required[0])

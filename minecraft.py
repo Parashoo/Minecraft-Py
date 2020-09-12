@@ -9,8 +9,10 @@ if not (Path() / "setup.log").exists():
 import glfw
 import glm
 import numpy as np
+import moderngl as mgl
 from OpenGL.GL import *
 from math import sin, cos
+from PIL import Image
 from packages import utilities, chunk, render, world_gen, model
 
 rootpath = Path(os.path.abspath(os.path.dirname(sys.argv[0])))
@@ -21,11 +23,27 @@ blocktexturepath = texturepath / "block"
 vertex_source_3d = shaderpath / "scene.vs"
 fragment_source_3d = shaderpath / "scene.fs"
 
+with vertex_source_3d.open() as src:
+    vertex_source_3d = src.read()
+with fragment_source_3d.open() as src:
+    fragment_source_3d = src.read()
+
 vertex_source_GUI = shaderpath / "hud.vs"
 fragment_source_GUI = shaderpath / "hud.fs"
 
+with vertex_source_GUI.open() as src:
+    vertex_source_GUI = src.read()
+with fragment_source_GUI.open() as src:
+    fragment_source_GUI = src.read()
+
 vertex_source_sky = shaderpath / "sky.vs"
 fragment_source_sky = shaderpath / "sky.fs"
+
+with vertex_source_sky.open() as src:
+    vertex_source_sky = src.read()
+with fragment_source_sky.open() as src:
+    fragment_source_sky = src.read()
+
 
 camera = utilities.camera((0, 16, 0), (0, 0, 0), (800, 600))
 
@@ -40,68 +58,41 @@ def main():
     test_world = world_gen.world('__DELETEME__', '-o')
     window = utilities.window()
     camera.setup_window(window)
+    ctx = mgl.create_context()
 
-    glEnable(GL_DEPTH_TEST)
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    crosshair = np.array([
-      0.0, 0.0, 0.0], dtype = 'float32')
+    ctx.enable(mgl.DEPTH_TEST | mgl.BLEND)
+    ctx.blend_func = mgl.SRC_ALPHA, mgl.ONE_MINUS_SRC_ALPHA
+        
+    scene = ctx.program(vertex_shader=vertex_source_3d, fragment_shader=fragment_source_3d)
+    hud = ctx.program(vertex_shader=vertex_source_GUI, fragment_shader=fragment_source_GUI)
+    sky = ctx.program(vertex_shader=vertex_source_sky, fragment_shader=fragment_source_sky)
 
-    shader_program_scene = utilities.shader(vertex_source_3d, fragment_source_3d, '330')
-    shader_program_scene.compile()
-
-    shader_program_hud = utilities.shader(vertex_source_GUI, fragment_source_GUI, '330')
-    shader_program_hud.compile()
-
-    shader_program_sky = utilities.shader(vertex_source_sky, fragment_source_sky, '330')
-    shader_program_sky.compile()
-
-    sky = np.array([
+    sky_data = np.array([     # Sky
         -1.0, 1.0, 0.0,
          1.0, 1.0, 0.0,
         -1.0,-1.0, 0.0,
          1.0,-1.0, 0.0], dtype = 'float32')
 
+    sky_vbo = ctx.buffer(sky_data)
+    sky_vao = ctx.vertex_array(sky, sky_vbo, "aPos")
     sky_vbo, sky_vao = glGenBuffers(1), glGenVertexArrays(1)
-    glBindVertexArray(sky_vao)
-    glBindBuffer(GL_ARRAY_BUFFER, sky_vbo)
-    glBufferData(GL_ARRAY_BUFFER, sky, GL_STATIC_DRAW)
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, ctypes.c_void_p(0))
-    glEnableVertexAttribArray(0)
+    crosshair = np.array([0, 0, 0], dtype = 'float32')     # Crosshair
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
-    glBindVertexArray(0)
+    vbo_2d = ctx.buffer(crosshair)
+    vao_2d = ctx.vertex_array(hud, vbo_2d, "aPos")
 
-    vbo_2d, vao_2d = glGenBuffers(1), glGenVertexArrays(1)
-
-    glBindVertexArray(vao_2d)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_2d)
-    glBufferData(GL_ARRAY_BUFFER, crosshair, GL_STATIC_DRAW)
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(0))
-    glEnableVertexAttribArray(0)
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, ctypes.c_void_p(12))
-    glEnableVertexAttribArray(1)
-
-    crosshair_texture = utilities.texture(texturepath / "icons.png", crop = (0,0,16,16))
-    crosshair_texture_ID = crosshair_texture.gen_texture()
-
-    shader_program_scene.use()
-    shader_program_scene.set_int('texture0', 0)
-
-    shader_program_hud.use()
-    shader_program_hud.set_int('texture0', 0)
+    crosshair_file = Image.open(texturepath / "icons.png").crop((0,0,16,16))
+    crosshair_texture = ctx.texture((16, 16), 4, crosshair_file.tobytes())
 
     camera_direction = glm.vec3()
     second_counter = 0
     frame_counter = 0
 
-    all_textures, layers = render.load_all_block_textures(blocktexturepath)
+    all_textures, layers = render.load_all_block_textures(blocktexturepath, ctx)
     all_models = model.load_all(rootpath)
 
-    world_render = render.render(layers, all_models, all_textures, shader_program_scene)
+    world_render = render.render(layers, all_models, all_textures, scene, ctx)
     all_chunks = test_world.return_all_chunks()
     chunk_arrays, chunk_sizes = world_render.create_buffers_from_chunks(all_chunks) 
 
@@ -117,38 +108,28 @@ def main():
 
         shader_program_sky.use()
         shader_program_sky.set_float('orientation', glm.radians(camera.pitch))
-        glDisable(GL_DEPTH_TEST)
-        glBindVertexArray(sky_vao)
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+        ctx.disable(mgl.DEPTH_TEST)
+        sky_vao.render(mode=mgl.TRIANGLE_STRIP)
 
         camera.process_input(window, delta_time)
         camera.testing_commands(window)
 
-        glActiveTexture(GL_TEXTURE0)
-
-        shader_program_scene.use()
-
         pos, looking, up = camera.return_vectors()
         view = glm.lookAt(pos, looking, up)
         projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
-        shader_program_scene.set_mat4('view', glm.value_ptr(view))
-        shader_program_scene.set_mat4('projection', glm.value_ptr(projection))
-
+        scene['view'].value = glm.value_ptr(view)
+        scene['projection'].value = glm.value_ptr(projection)
+        scene['texture0'] = 0
+        all_textures.use(location=0)
+        
         if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
-            test_world.return_chunk_containing_block([int(i) for i in pos]).update_associated_VBO(world_render)
-        glEnable(GL_DEPTH_TEST)
+            test_world.set_block(tuple(glm.ivec3(pos)), 3, world_render)
+        ctx.enable(mgl.DEPTH_TEST)
         world_render.draw_from_chunks(chunk_arrays, chunk_sizes)
-        glBindVertexArray(0)
 
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, crosshair_texture_ID)
-
-        shader_program_hud.use()
-
-
-        glBindVertexArray(vao_2d)
-        glPointSize(32)
-        glDrawArrays(GL_POINTS, 0, 1)
+        hud['texture0'] = 0
+        crosshair_texture.use(location=0)
+        crosshair.render(mode=mgl.POINTS)
 
         if second_counter >= 1:
             fps_list.append(frame_counter)
