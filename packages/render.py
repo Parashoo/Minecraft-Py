@@ -156,6 +156,6 @@ def load_all_block_textures(sourcepath, context):
         layer_list.update({str(texture)[len(str(sourcepath))+1:]: num})
     texture_array_data = np.array(texture_list, dtype = "uint8")
     block_tex_array = context.texture_array((16, 16, len(texture_list)), 4, texture_array_data)
-    block_tex_array.filter = (mgl.NEAREST, mgl.NEAREST)
     block_tex_array.build_mipmaps()
+    block_tex_array.filter = (mgl.LINEAR_MIPMAP_NEAREST, mgl.NEAREST)
     return block_tex_array, layer_list

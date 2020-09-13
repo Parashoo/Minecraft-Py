@@ -83,6 +83,7 @@ def main():
 
     crosshair_file = Image.open(texturepath / "icons.png").crop((0,0,16,16))
     crosshair_texture = ctx.texture((16, 16), 4, crosshair_file.tobytes())
+    crosshair_texture.filter = (mgl.NEAREST, mgl.NEAREST)
 
     camera_direction = glm.vec3()
     second_counter = 0
