@@ -7,7 +7,7 @@ class chunk:
     def __init__(self, *args, gen=False):
         if gen:
             self.data = np.zeros((18, 257, 18), dtype="uint8")
-            self.fill_layers(0, random.randint(0, 16), 3)
+            self.fill_layers(0, random.randint(1, 16), 3)
         else:
             world = args[0]
             self.corner = args[1]

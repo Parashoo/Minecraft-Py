@@ -75,7 +75,6 @@ def main():
 
     sky_vbo = ctx.buffer(sky_data)
     sky_vao = ctx.vertex_array(sky, sky_vbo, "aPos")
-    sky_vbo, sky_vao = glGenBuffers(1), glGenVertexArrays(1)
 
     crosshair = np.array([0, 0, 0], dtype = 'float32')     # Crosshair
 
@@ -94,7 +93,7 @@ def main():
 
     world_render = render.render(layers, all_models, all_textures, scene, ctx)
     all_chunks = test_world.return_all_chunks()
-    chunk_arrays, chunk_sizes = world_render.create_buffers_from_chunks(all_chunks) 
+    chunk_arrays = world_render.create_buffers_from_chunks(all_chunks) 
 
     while not window.check_if_closed():
 
@@ -104,10 +103,9 @@ def main():
         second_counter += delta_time
         frame_counter += 1
 
-        window.refresh(0)
+        window.refresh(0, ctx)
 
-        shader_program_sky.use()
-        shader_program_sky.set_float('orientation', glm.radians(camera.pitch))
+        sky['orientation'] = glm.radians(camera.pitch)
         ctx.disable(mgl.DEPTH_TEST)
         sky_vao.render(mode=mgl.TRIANGLE_STRIP)
 
@@ -117,24 +115,26 @@ def main():
         pos, looking, up = camera.return_vectors()
         view = glm.lookAt(pos, looking, up)
         projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
-        scene['view'].value = glm.value_ptr(view)
-        scene['projection'].value = glm.value_ptr(projection)
+        view = [item for subtup in view.to_tuple() for item in subtup]
+        projection = [item for subtup in projection.to_tuple() for item in subtup]
+        scene['view'].value = tuple(view)
+        scene['projection'].value = tuple(projection)
         scene['texture0'] = 0
         all_textures.use(location=0)
         
         if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
             test_world.set_block(tuple(glm.ivec3(pos)), 3, world_render)
         ctx.enable(mgl.DEPTH_TEST)
-        world_render.draw_from_chunks(chunk_arrays, chunk_sizes)
+        world_render.draw_from_chunks(chunk_arrays)
 
         hud['texture0'] = 0
         crosshair_texture.use(location=0)
-        crosshair.render(mode=mgl.POINTS)
+        vao_2d.render(mode=mgl.POINTS)
 
         if second_counter >= 1:
             fps_list.append(frame_counter)
             second_counter, frame_counter = 0, 0
-        window.refresh(1)
+        window.refresh(1, ctx)
 
     window.close()
     print('\n===== End statistics =====')

@@ -1,10 +1,10 @@
 import glm
 import numpy as np
 import sys, os
-import multiprocessing as mp
+
 from PIL import Image
 from pathlib import Path
-from OpenGL.GL import *
+import moderngl as mgl
 import time
 import ctypes
 
@@ -97,9 +97,9 @@ class render:
         Returns pointers to the buffer and array created, as well as the size of the buffer created (for drawing purposes).
         """
         render_list = self.generate_vertex_data(data)
-        print(self.program._members)
         vbo = self.context.buffer(render_list.tobytes())
-        vao = self.context.vertex_array(self.program, [(vbo, "3f4 2f4 3f4 1f4 /v", "aPos", "aTexCoords", "cube_coord", "blockType")])            
+        vao = self.context.vertex_array(self.program, [(vbo, "3f4 2f4 3f4 1f4 /v", "aPos", "aTexCoord", "cube_coord", "blockType")])            
+        print("Success")
         return vbo, vao
        
     def create_buffers_from_world(self, coords_list):
@@ -123,7 +123,7 @@ class render:
         self.time_required = time.time() - now
         sys.stdout.write("Done\n")
         sys.stdout.flush()
-        return self.vao_list, self.sizes_list
+        return self.vao_list
 
     def update_buffer(self, pointer, new_data):
         #glBindVertexArray(self.vao_list[pointer])
@@ -135,7 +135,7 @@ class render:
         #glBufferSubData(GL_ARRAY_BUFFER, 0, draw_data.nbytes, draw_data)
         #self.previous_draw_data = draw_data
 
-    def draw_from_chunks(self, array_list, size_list):
+    def draw_from_chunks(self, array_list):
         for index, array in enumerate(self.vao_list):
             array.render()
 
@@ -156,4 +156,6 @@ def load_all_block_textures(sourcepath, context):
         layer_list.update({str(texture)[len(str(sourcepath))+1:]: num})
     texture_array_data = np.array(texture_list, dtype = "uint8")
     block_tex_array = context.texture_array((16, 16, len(texture_list)), 4, texture_array_data)
+    block_tex_array.filter = (mgl.NEAREST, mgl.NEAREST)
+    block_tex_array.build_mipmaps()
     return block_tex_array, layer_list

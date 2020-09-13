@@ -273,13 +273,12 @@ class window:
         sys.stdout.write("Done\n")
         sys.stdout.flush()
 
-    def refresh(self, step, *options):
+    def refresh(self, step, context, *options):
         color = (0.2, 0.3, 0.3, 1.0)
         if options:
             color = options[0]
         if step == 0:
-            #glClearColor(color[0], color[1], color[2], color[3])
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            context.clear()
         if step == 1:
             glfw.swap_buffers(self.window)
             glfw.poll_events()
