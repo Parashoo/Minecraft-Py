@@ -116,10 +116,8 @@ def main():
         pos, looking, up = camera.return_vectors()
         view = glm.lookAt(pos, looking, up)
         projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
-        view = [item for subtup in view.to_tuple() for item in subtup]
-        projection = [item for subtup in projection.to_tuple() for item in subtup]
-        scene['view'].value = tuple(view)
-        scene['projection'].value = tuple(projection)
+        scene['view'].write(view)
+        scene['projection'].write(projection)
         scene['texture0'] = 0
         all_textures.use(location=0)
         

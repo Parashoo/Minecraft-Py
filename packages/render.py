@@ -12,54 +12,63 @@ class render:
     """
     Class that manages VBO and VAO creation, as well as drawing these.
     """
+    model_faces = {
+        0: "north",
+        1: "south",
+        2: "east",
+        3: "west",
+        4: "top",
+        5: "bottom",
+    }
     faces = {
-            "south": [
-              0.0,  0.0,  0.0,  1.0, 1.0,
-              1.0,  0.0,  0.0,  0.0, 1.0,
-              1.0,  1.0,  0.0,  0.0, 0.0,
-              1.0,  1.0,  0.0,  0.0, 0.0,
-              0.0,  1.0,  0.0,  1.0, 0.0,
-              0.0,  0.0,  0.0,  1.0, 1.0],
+            0: [
+              1.0,  0.0,  1.0,
+              1.0,  1.0,  1.0,
+              0.0,  0.0,  1.0,
+              0.0,  0.0,  1.0,
+              1.0,  1.0,  1.0,
+              0.0,  1.0,  1.0],
 
-            "north": [
-              0.0,  0.0,  1.0,  1.0, 1.0,
-              1.0,  0.0,  1.0,  0.0, 1.0,
-              1.0,  1.0,  1.0,  0.0, 0.0,
-              1.0,  1.0,  1.0,  0.0, 0.0,
-              0.0,  1.0,  1.0,  1.0, 0.0,
-              0.0,  0.0,  1.0,  1.0, 1.0],
+            1: [
+              0.0,  0.0,  0.0,
+              0.0,  1.0,  0.0,
+              1.0,  0.0,  0.0,
+              1.0,  0.0,  0.0,
+              0.0,  1.0,  0.0,
+              1.0,  1.0,  0.0],
 
-            "west": [
-              0.0,  1.0,  1.0,  1.0, 0.0,
-              0.0,  1.0,  0.0,  0.0, 0.0,
-              0.0,  0.0,  0.0,  0.0, 1.0,
-              0.0,  0.0,  0.0,  0.0, 1.0,
-              0.0,  0.0,  1.0,  1.0, 1.0,
-              0.0,  1.0,  1.0,  1.0, 0.0],
+            2: [
+              1.0,  0.0,  0.0,
+              1.0,  1.0,  0.0,
+              1.0,  0.0,  1.0,
+              1.0,  0.0,  1.0,
+              1.0,  1.0,  0.0,
+              1.0,  1.0,  1.0],
 
-            "east": [
-              1.0,  1.0,  1.0,  1.0, 0.0,
-              1.0,  1.0,  0.0,  0.0, 0.0,
-              1.0,  0.0,  0.0,  0.0, 1.0,
-              1.0,  0.0,  0.0,  0.0, 1.0,
-              1.0,  0.0,  1.0,  1.0, 1.0,
-              1.0,  1.0,  1.0,  1.0, 0.0],
+            3: [
+              0.0,  0.0,  1.0,
+              0.0,  1.0,  1.0,
+              0.0,  0.0,  0.0,
+              0.0,  0.0,  0.0,
+              0.0,  1.0,  1.0,
+              0.0,  1.0,  0.0],
 
-            "bottom": [
-              0.0,  0.0,  0.0,  0.0, 1.0,
-              1.0,  0.0,  0.0,  1.0, 1.0,
-              1.0,  0.0,  1.0,  1.0, 0.0,
-              1.0,  0.0,  1.0,  1.0, 0.0,
-              0.0,  0.0,  1.0,  0.0, 0.0,
-              0.0,  0.0,  0.0,  0.0, 1.0],
+            4: [
+              0.0,  1.0,  0.0,
+              0.0,  1.0,  1.0,
+              1.0,  1.0,  0.0,
+              1.0,  1.0,  0.0,
+              0.0,  1.0,  1.0,
+              1.0,  1.0,  1.0],
 
-            "top": [
-              0.0,  1.0,  0.0,  0.0, 1.0,
-              1.0,  1.0,  0.0,  1.0, 1.0,
-              1.0,  1.0,  1.0,  1.0, 0.0,
-              1.0,  1.0,  1.0,  1.0, 0.0,
-              0.0,  1.0,  1.0,  0.0, 0.0,
-              0.0,  1.0,  0.0,  0.0, 1.0]
+            5: [
+              0.0,  0.0,  1.0,
+              0.0,  0.0,  0.0,
+              1.0,  0.0,  1.0,
+              1.0,  0.0,  1.0,
+              0.0,  0.0,  0.0,
+              1.0,  0.0,  0.0]
+
              }
 
     def __init__(self, layer_list, model_list, texture, program, context):
@@ -78,30 +87,47 @@ class render:
         self.context = context
         self.previous_draw_data = np.array([], dtype = "float32")
 
-    def generate_vertex_data(self, data):
-        render_list = []
-        for i in data:
-            render_list.append([
-                render.faces[i[4]][0] ,  render.faces[i[4]][1] ,  render.faces[i[4]][2] ,  render.faces[i[4]][3] , render.faces[i[4]][4] , i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
-                render.faces[i[4]][5] ,  render.faces[i[4]][6] ,  render.faces[i[4]][7] ,  render.faces[i[4]][8] , render.faces[i[4]][9] , i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
-                render.faces[i[4]][10],  render.faces[i[4]][11],  render.faces[i[4]][12],  render.faces[i[4]][13], render.faces[i[4]][14], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
-                render.faces[i[4]][15],  render.faces[i[4]][16],  render.faces[i[4]][17],  render.faces[i[4]][18], render.faces[i[4]][19], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
-                render.faces[i[4]][20],  render.faces[i[4]][21],  render.faces[i[4]][22],  render.faces[i[4]][23], render.faces[i[4]][24], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]],
-                render.faces[i[4]][25],  render.faces[i[4]][26],  render.faces[i[4]][27],  render.faces[i[4]][28], render.faces[i[4]][29], i[0], i[1], i[2], self.layer_list[self.model_list[i[3]]["textures"][i[4]]]])
-        return np.array(render_list, dtype = "float32")
+    def generate_face_data(self, face, corner):
+        now = time.time()
+        x, y, z = face[0] + corner[0] *16, face[1], face[2] + corner[1] * 16
+        face_vertex_data = [
+        render.faces[face[4]][0] + x,  render.faces[face[4]][1] + y,  render.faces[face[4]][2] + z,  0.0, 1.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
+        render.faces[face[4]][3] + x,  render.faces[face[4]][4] + y,  render.faces[face[4]][5] + z,  0.0, 0.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
+        render.faces[face[4]][6] + x,  render.faces[face[4]][7] + y,  render.faces[face[4]][8] + z,  1.0, 1.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
+        render.faces[face[4]][9] + x,  render.faces[face[4]][10]+ y,  render.faces[face[4]][11]+ z,  1.0, 1.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
+        render.faces[face[4]][12]+ x,  render.faces[face[4]][13]+ y,  render.faces[face[4]][14]+ z,  0.0, 0.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
+        render.faces[face[4]][15]+ x,  render.faces[face[4]][16]+ y,  render.faces[face[4]][17]+ z,  1.0, 0.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]]]
+        return face_vertex_data
 
-    def create_buffer(self, data):
-        """
-        Create a VBO and a VAO for the data passed as argument.
+    def generate_vertex_data(self, data, top, corner):
+        now = time.time()
+        render_list = []
+        for index, i in np.ndenumerate(data[:,:top,:,:]):
+            if i == 0:
+                continue
+            x = index[0] + corner[0] * 16
+            y = index[1]
+            z = index[2] + corner[1] * 16
+            f = index[3]
+            render_list.append([
+                render.faces[f][0] + x,  render.faces[f][1] + y,  render.faces[f][2] + z,  0.0, 1.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
+                render.faces[f][3] + x,  render.faces[f][4] + y,  render.faces[f][5] + z,  0.0, 0.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
+                render.faces[f][6] + x,  render.faces[f][7] + y,  render.faces[f][8] + z,  1.0, 1.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
+                render.faces[f][9] + x,  render.faces[f][10]+ y,  render.faces[f][11]+ z,  1.0, 1.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
+                render.faces[f][12]+ x,  render.faces[f][13]+ y,  render.faces[f][14]+ z,  0.0, 0.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
+                render.faces[f][15]+ x,  render.faces[f][16]+ y,  render.faces[f][17]+ z,  1.0, 0.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]]])
+        return render_list
+
+    def create_buffer(self, data, top, corner):
+        """ Create a VBO and a VAO for the data passed as argument.
         data should be a list of faces and coordinates structured as returned by chunk.return_neighbours().
         Returns pointers to the buffer and array created, as well as the size of the buffer created (for drawing purposes).
         """
-        render_list = self.generate_vertex_data(data)
-        vbo = self.context.buffer(render_list.tobytes())
-        vao = self.context.vertex_array(self.program, [(vbo, "3f4 2f4 3f4 1f4 /v", "aPos", "aTexCoord", "cube_coord", "blockType")])            
-        print("Success")
-        return vbo, vao
-       
+        render_list = self.generate_vertex_data(data, top, corner)
+        vbo = self.context.buffer(np.array(render_list, dtype = "float32").tobytes())
+        vao = self.context.vertex_array(self.program, [(vbo, "3f4 2f4 1f4 /v", "aPos", "aTexCoord", "blockType")])
+        return vbo, vao, render_list
+
     def create_buffers_from_world(self, coords_list):
         sys.stdout.write("Creating render buffer... ")
         now = time.time()
@@ -110,46 +136,38 @@ class render:
         sys.stdout.write("Done\n")
         sys.stdout.flush()
         self.time_required = time.time() - now
-    
+
     def create_buffers_from_chunks(self, chunk_list):
         self.vbo_list, self.vao_list = [], []
         sys.stdout.write("Creating buffers... ")
         sys.stdout.flush()
         now = time.time()
         for index, chunk in enumerate(chunk_list):
-            new_vbo, new_vao = self.create_buffer(chunk.exposed_list)
+            print("Buffering chunk ", index)
+            new_vbo, new_vao, render_list = self.create_buffer(chunk.render_array, chunk.top_block_layer, chunk.corner)
             self.vbo_list.append(new_vbo)
             self.vao_list.append(new_vao)
+            chunk.GL_pointer = index
+            chunk.render_list = render_list
         self.time_required = time.time() - now
         sys.stdout.write("Done\n")
         sys.stdout.flush()
         return self.vao_list
 
-    def update_buffer(self, pointer, new_data):
-        #glBindVertexArray(self.vao_list[pointer])
-        #glBindBuffer(GL_ARRAY_BUFFER, self.vbo_list[pointer])
-        #draw_data = self.generate_vertex_data(new_data)
-        #self.sizes_list[pointer] = draw_data.nbytes
-        glBufferSubData(GL_ARRAY_BUFFER, 256, 9, None)
-        #print(draw_data.size - self.previous_draw_data.size)
-        #glBufferSubData(GL_ARRAY_BUFFER, 0, draw_data.nbytes, draw_data)
-        #self.previous_draw_data = draw_data
+    def update_buffer(self, pointer, new_data, top, corner):
+        data = np.array(self.generate_vertex_data(new_data, top, corner), dtype="float32")
+        print("Updating buffer")
+        self.vbo_list[pointer].orphan(data.nbytes)
+        self.vbo_list[pointer].write(data)
 
     def draw_from_chunks(self, array_list):
         for index, array in enumerate(self.vao_list):
-            array.render()
-
-    def draw_buffer(self): ### DEPRECATED ###
-        self.program.use()
-        glBindTexture(GL_TEXTURE_2D_ARRAY, self.texture)
-        glBindVertexArray(self.render_vao)
-        glDrawArrays(GL_TRIANGLES, 0, self.render_size * 6)
+            array.render(vertices = int(self.vbo_list[index].size / 24))
 
 def load_all_block_textures(sourcepath, context):
-    
     layer_list = {}
     texture_list = []
-    
+
     for num, texture in enumerate(sourcepath.iterdir()):
         tex_file = Image.open(texture)
         texture_list.append(list(tex_file.getdata()))
