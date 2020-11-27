@@ -35,6 +35,17 @@ void main() {
     float f = mod(n, 6.0);
 
     mat4 model = mat4(1.0);
-    model[3] = vec4(aPos, 1.0);
+
+
+    vec3 worldpos = vec3(x, y, z) + corner;
+
+    model[3] = vec4(vertices[faces[f]], 1.0);
     
+    model[3] = vec4(vertices[faces[f+1]], 1.0);
+    
+    model[3] = vec4(vertices[faces[f+2]], 1.0);
+    
+    model[3] = vec4(vertices[faces[f+3]], 1.0);
+    
+
 }
