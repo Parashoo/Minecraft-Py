@@ -3,6 +3,16 @@
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
+flat in int tex_index[];
+
+uniform mat4 view;
+uniform mat4 projection;
+
+mat4 model = mat4(1.0);
+
+out vec2 texCoord;
+flat out int texLayer;
+
 vec3 vertices[8] = vec3[8](vec3(0.0, 0.0, 0.0), 
                            vec3(0.0, 1.0, 0.0), 
                            vec3(1.0, 0.0, 0.0), 
@@ -11,11 +21,6 @@ vec3 vertices[8] = vec3[8](vec3(0.0, 0.0, 0.0),
                            vec3(1.0, 1.0, 1.0), 
                            vec3(0.0, 0.0, 1.0), 
                            vec3(0.0, 1.0, 1.0));
-
-vec2 tex_coords[4] = vec2[4](vec2(0.0, 0.0),
-                             vec2(0.0, 1.0),
-                             vec2(1.0, 0.0),
-                             vec2(1.0, 1.0));
 
 int faces[24] = int[24](4, 5, 6, 7,
                         0, 1, 2, 3,
@@ -26,26 +31,30 @@ int faces[24] = int[24](4, 5, 6, 7,
 
 void main() {
 
-    float n = gl_VertexID;
-    float x = floor(n / (256.0 * 16.0 * 6.0));
-    n = mod(n, 256.0 * 16.0 * 6.0);
-    float y = floor(n / (16.0 * 6.0));
-    n = mod(n, 16.0 * 6.0);
-    float z = floor(n / 6.0);
-    float f = mod(n, 6.0);
+    texLayer = tex_index[0];
+    int face_index = int(gl_in[0].gl_Position.w * 4.0);
 
-    mat4 model = mat4(1.0);
+    model[3] = vec4(gl_in[0].gl_Position.xyz + vertices[faces[face_index]], 1.0);
+    gl_Position = view * projection * model * vec4(0.0, 0.0, 0.0, 1.0);
+    texCoord = vec2(0.0, 0.0);
+    EmitVertex();
 
+    model[3] = vec4(gl_in[0].gl_Position.xyz + vertices[faces[face_index + 1]], 1.0);
+    gl_Position = view * projection * model * vec4(0.0, 0.0, 0.0, 1.0);
+    texCoord = vec2(0.0, 1.0);
+    EmitVertex();
 
-    vec3 worldpos = vec3(x, y, z) + corner;
+    model[3] = vec4(gl_in[0].gl_Position.xyz + vertices[faces[face_index + 2]], 1.0);
+    gl_Position = view * projection * model * vec4(0.0, 0.0, 0.0, 1.0);
+    texCoord = vec2(1.0, 0.0);
+    EmitVertex();
 
-    model[3] = vec4(vertices[faces[f]], 1.0);
-    
-    model[3] = vec4(vertices[faces[f+1]], 1.0);
-    
-    model[3] = vec4(vertices[faces[f+2]], 1.0);
-    
-    model[3] = vec4(vertices[faces[f+3]], 1.0);
+    model[3] = vec4(gl_in[0].gl_Position.xyz + vertices[faces[face_index + 3]], 1.0);
+    gl_Position = view * projection * model * vec4(0.0, 0.0, 0.0, 1.0);
+    texCoord = vec2(1.0, 1.0);
+    EmitVertex();
+
+    EndPrimitive();
     
 
 }

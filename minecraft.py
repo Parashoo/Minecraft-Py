@@ -21,10 +21,13 @@ texturepath = rootpath / "ressources"
 blocktexturepath = texturepath / "block"
 
 vertex_source_3d = shaderpath / "scene.vs"
+geometry_source_3d = shaderpath / "scene.gs"
 fragment_source_3d = shaderpath / "scene.fs"
 
 with vertex_source_3d.open() as src:
     vertex_source_3d = src.read()
+with geometry_source_3d.open() as src:
+    geometry_source_3d = src.read()
 with fragment_source_3d.open() as src:
     fragment_source_3d = src.read()
 
@@ -62,8 +65,8 @@ def main():
 
     ctx.enable(mgl.DEPTH_TEST | mgl.BLEND)
     ctx.blend_func = mgl.SRC_ALPHA, mgl.ONE_MINUS_SRC_ALPHA
-        
-    scene = ctx.program(vertex_shader=vertex_source_3d, fragment_shader=fragment_source_3d)
+
+    scene = ctx.program(vertex_shader=vertex_source_3d, geometry_shader=geometry_source_3d, fragment_shader=fragment_source_3d)
     hud = ctx.program(vertex_shader=vertex_source_GUI, fragment_shader=fragment_source_GUI)
     sky = ctx.program(vertex_shader=vertex_source_sky, fragment_shader=fragment_source_sky)
 
