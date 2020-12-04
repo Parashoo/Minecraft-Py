@@ -95,7 +95,7 @@ class render:
         render_list = data.flatten()
         vbo = self.context.buffer(render_list)
         vao = self.context.vertex_array(self.program, [(vbo, "1i2 /v", "blocktype")])
-        return vbo, vao, render_list
+        return vbo, vao
 
     def create_buffers_from_chunks(self, chunk_list):
         self.vbo_list, self.vao_list = [], []
@@ -104,7 +104,7 @@ class render:
         now = time.time()
         for index, chunk in enumerate(chunk_list):
             print("Buffering chunk ", index)
-            new_vbo, new_vao, render_list = self.create_buffer(chunk.render_array)
+            new_vbo, new_vao = self.create_buffer(chunk.render_array)
             self.vbo_list.append(new_vbo)
             self.vao_list.append(new_vao)
             chunk.GL_pointer = index
@@ -121,7 +121,7 @@ class render:
 
     def draw_from_chunks(self, array_list):
         for index, array in enumerate(self.vao_list):
-            array.render()
+            array.render(mode=mgl.POINTS)
 
 def load_all_block_textures(sourcepath, context):
     layer_list = {}
