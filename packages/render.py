@@ -98,7 +98,7 @@ class render:
         return vbo, vao
 
     def create_buffers_from_chunks(self, chunk_list):
-        self.vbo_list, self.vao_list = [], []
+        self.vbo_list, self.vao_list, self.corner_list = [], [], []
         sys.stdout.write("Creating buffers... ")
         sys.stdout.flush()
         now = time.time()
@@ -107,6 +107,7 @@ class render:
             new_vbo, new_vao = self.create_buffer(chunk.render_array)
             self.vbo_list.append(new_vbo)
             self.vao_list.append(new_vao)
+            self.corner_list.append(chunk.corner)
             chunk.GL_pointer = index
         self.time_required = time.time() - now
         sys.stdout.write("Done\n")
@@ -121,6 +122,7 @@ class render:
 
     def draw_from_chunks(self, array_list):
         for index, array in enumerate(self.vao_list):
+            self.program['corner'] = self.corner_list[index]
             array.render(mode=mgl.POINTS)
 
 def load_all_block_textures(sourcepath, context):

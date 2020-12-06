@@ -84,9 +84,6 @@ def main():
     vbo_2d = ctx.buffer(crosshair)
     vao_2d = ctx.vertex_array(hud, vbo_2d, "aPos")
 
-    test_vbo = ctx.buffer(np.array([0, 1, 2, 3, 4, 5], dtype = 'int16'))
-    test_vao = ctx.vertex_array(scene, [(test_vbo, "1i2 /v", "blocktype")])
-
     crosshair_file = Image.open(texturepath / "icons.png").crop((0,0,16,16))
     crosshair_texture = ctx.texture((16, 16), 4, crosshair_file.tobytes())
     crosshair_texture.filter = (mgl.NEAREST, mgl.NEAREST)
@@ -125,7 +122,6 @@ def main():
         scene['view'].write(view)
         scene['projection'].write(projection)
         scene['texture0'] = 0
-        scene['corner'] = (0, 0, 0)
 
         all_textures.use(location=0)
         
@@ -137,8 +133,6 @@ def main():
         hud['texture0'] = 0
         crosshair_texture.use(location=0)
         vao_2d.render(mode=mgl.POINTS)
-
-        #test_vao.render(mode=mgl.POINTS)
 
         if second_counter >= 1:
             fps_list.append(frame_counter)

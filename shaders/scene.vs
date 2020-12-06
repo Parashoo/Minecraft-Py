@@ -2,7 +2,7 @@
 
 layout (location = 0) in int blocktype;
 
-uniform vec3 corner;
+uniform vec2 corner;
 
 flat out int tex_index;
 
@@ -16,7 +16,7 @@ void main() {
     float z = floor(n / 6.0);
     float f = mod(n, 6.0);
     
-    gl_Position = vec4(x + corner.x, y + corner.y, z + corner.z, f);
+    gl_Position = vec4(x + corner.x * 16, y, z + corner.y * 16, f);
     tex_index = blocktype;
 
 }

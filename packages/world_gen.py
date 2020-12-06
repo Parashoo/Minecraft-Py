@@ -76,26 +76,12 @@ class world:
         self.chunk_pointer_dict = {}
         self.chunk_list = []
         for index, chunk_info in enumerate(self.chunk_dict.items()):
+            print(chunk_info[0])
             self.chunk_list.append(chunk.chunk(self, eval(chunk_info[0])).return_exposed())
             self.chunk_pointer_dict[eval(chunk_info[0])] = index
         self.time_required.append(time() - now)
         sys.stdout.write("Done\n")
         return self.chunk_list
-
-    def return_neighbours(self, corner):
-        neighbour_chunk_corners = [
-            (corner[0], corner[1] + 1),
-            (corner[0], corner[1] - 1),
-            (corner[0] + 1, corner[1]),
-            (corner[0] - 1, corner[1])]
-        neighbours = []
-        for neighbour_corner in neighbour_chunk_corners:
-            try:
-                neighbours.append(chunk.return_chunk_data(corner, self.world_lines[self.chunk_dict[str(neighbour_corner)]][:-1]))
-            except KeyError:
-                neighbours.append(np.zeros((18, 257, 18), dtype = 'uint8'))
-
-        return neighbours
 
     def set_block(self, coords, blocktype, renderer):
         target_chunk = self.return_chunk_containing_block(coords)
