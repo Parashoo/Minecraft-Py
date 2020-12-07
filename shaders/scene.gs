@@ -34,6 +34,8 @@ void main() {
     texLayer = tex_index[0];
     int face_index = int(gl_in[0].gl_Position.w * 4.0);
 
+    if (texLayer > 0) {
+
     model[3] = vec4(gl_in[0].gl_Position.xyz + vertices[faces[face_index]], 1.0);
     gl_Position = projection * view * model * vec4(0.0, 0.0, 0.0, 1.0);
     texCoord = vec2(0.0, 0.0);
@@ -56,5 +58,6 @@ void main() {
 
     EndPrimitive();
     
-
+    }
+    
 }
