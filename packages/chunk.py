@@ -7,7 +7,7 @@ class chunk:
     def __init__(self, *args, gen=False):
         if gen:
             self.data = np.zeros((18, 257, 18), dtype="uint8")
-            self.fill_layers(0, random.randint(1, 16), 3)
+            self.fill_layers(1, random.randint(1, 16), 9)
         else:
             world = args[0]
             self.corner = args[1]
@@ -15,10 +15,9 @@ class chunk:
             self.data[:,:,16], self.data[:,:,17], self.data[16,:,:], self.data[17,:,:] = world.return_neighbour_slices(self.corner)
             self.GL_pointer = None
             self.render_array = np.zeros((16, 256, 16, 6), dtype = "int16")
-            self.blocktype = 5
 
     def fill_layers(self, bottom_layer, top_layer, block_type):
-        for i in range(top_layer - bottom_layer):
+        for i in range(top_layer + 1 - bottom_layer):
             self.data[:16,i+bottom_layer,:16] = np.full((16, 16), block_type, dtype = 'uint8')
 
     def add_remove_faces(self, coords, blocktype, renderer):
@@ -40,6 +39,7 @@ class chunk:
         renderer.update_buffer(self.GL_pointer, self.render_array, self.top_block_layer, self.corner)
 
     def return_exposed(self):
+        print(self.corner)
         self.top_block_layer = 0
         for i in range(256):
             if not np.all(self.data[:16,255-i,:16] == np.zeros((16, 16), dtype = 'uint8')):
@@ -54,4 +54,5 @@ class chunk:
             neighbours = [self.data[tuple([x, y, z] + chunk.indices[i])] for i in range(6)]
             for index, item in enumerate(neighbours):
                 if item == 0: self.render_array[x, y, z, index] = blocktype
+        #print(self.render_array)
         return self

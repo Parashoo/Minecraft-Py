@@ -87,68 +87,28 @@ class render:
         self.context = context
         self.previous_draw_data = np.array([], dtype = "float32")
 
-    def generate_face_data(self, face, corner):
-        now = time.time()
-        x, y, z = face[0] + corner[0] *16, face[1], face[2] + corner[1] * 16
-        face_vertex_data = [
-        render.faces[face[4]][0] + x,  render.faces[face[4]][1] + y,  render.faces[face[4]][2] + z,  0.0, 1.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
-        render.faces[face[4]][3] + x,  render.faces[face[4]][4] + y,  render.faces[face[4]][5] + z,  0.0, 0.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
-        render.faces[face[4]][6] + x,  render.faces[face[4]][7] + y,  render.faces[face[4]][8] + z,  1.0, 1.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
-        render.faces[face[4]][9] + x,  render.faces[face[4]][10]+ y,  render.faces[face[4]][11]+ z,  1.0, 1.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
-        render.faces[face[4]][12]+ x,  render.faces[face[4]][13]+ y,  render.faces[face[4]][14]+ z,  0.0, 0.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]],
-        render.faces[face[4]][15]+ x,  render.faces[face[4]][16]+ y,  render.faces[face[4]][17]+ z,  1.0, 0.0, self.layer_list[self.model_list[face[3]]["textures"][face[4]]]]
-        return face_vertex_data
-
-    def generate_vertex_data(self, data, top, corner):
-        now = time.time()
-        render_list = []
-        for index, i in np.ndenumerate(data[:,:top,:,:]):
-            if i == 0:
-                continue
-            x = index[0] + corner[0] * 16
-            y = index[1]
-            z = index[2] + corner[1] * 16
-            f = index[3]
-            render_list.append([
-                render.faces[f][0] + x,  render.faces[f][1] + y,  render.faces[f][2] + z,  0.0, 1.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
-                render.faces[f][3] + x,  render.faces[f][4] + y,  render.faces[f][5] + z,  0.0, 0.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
-                render.faces[f][6] + x,  render.faces[f][7] + y,  render.faces[f][8] + z,  1.0, 1.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
-                render.faces[f][9] + x,  render.faces[f][10]+ y,  render.faces[f][11]+ z,  1.0, 1.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
-                render.faces[f][12]+ x,  render.faces[f][13]+ y,  render.faces[f][14]+ z,  0.0, 0.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]],
-                render.faces[f][15]+ x,  render.faces[f][16]+ y,  render.faces[f][17]+ z,  1.0, 0.0, self.layer_list[self.model_list[i]["textures"][render.model_faces[f]]]])
-        return render_list
-
-    def create_buffer(self, data, top, corner):
+    def create_buffer(self, data):
         """ Create a VBO and a VAO for the data passed as argument.
         data should be a list of faces and coordinates structured as returned by chunk.return_neighbours().
         Returns pointers to the buffer and array created, as well as the size of the buffer created (for drawing purposes).
         """
-        render_list = self.generate_vertex_data(data, top, corner)
-        vbo = self.context.buffer(np.array(render_list, dtype = "float32").tobytes())
-        vao = self.context.vertex_array(self.program, [(vbo, "3f4 2f4 1f4 /v", "aPos", "aTexCoord", "blockType")])
-        return vbo, vao, render_list
-
-    def create_buffers_from_world(self, coords_list):
-        sys.stdout.write("Creating render buffer... ")
-        now = time.time()
-        sys.stdout.flush()
-        self.render_vbo, self.render_vao, self.render_size = self.create_buffer(coords_list)
-        sys.stdout.write("Done\n")
-        sys.stdout.flush()
-        self.time_required = time.time() - now
+        render_list = data.flatten()
+        vbo = self.context.buffer(render_list)
+        vao = self.context.vertex_array(self.program, [(vbo, "1i2 /v", "blocktype")])
+        return vbo, vao
 
     def create_buffers_from_chunks(self, chunk_list):
-        self.vbo_list, self.vao_list = [], []
+        self.vbo_list, self.vao_list, self.corner_list = [], [], []
         sys.stdout.write("Creating buffers... ")
         sys.stdout.flush()
         now = time.time()
         for index, chunk in enumerate(chunk_list):
             print("Buffering chunk ", index)
-            new_vbo, new_vao, render_list = self.create_buffer(chunk.render_array, chunk.top_block_layer, chunk.corner)
+            new_vbo, new_vao = self.create_buffer(chunk.render_array)
             self.vbo_list.append(new_vbo)
             self.vao_list.append(new_vao)
+            self.corner_list.append(chunk.corner)
             chunk.GL_pointer = index
-            chunk.render_list = render_list
         self.time_required = time.time() - now
         sys.stdout.write("Done\n")
         sys.stdout.flush()
@@ -162,7 +122,8 @@ class render:
 
     def draw_from_chunks(self, array_list):
         for index, array in enumerate(self.vao_list):
-            array.render(vertices = int(self.vbo_list[index].size / 24))
+            self.program['corner'] = self.corner_list[index]
+            array.render(mode=mgl.POINTS)
 
 def load_all_block_textures(sourcepath, context):
     layer_list = {}

@@ -1,20 +1,22 @@
 #version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-layout (location = 2) in float blockType;
+layout (location = 0) in int blocktype;
 
-out vec2 TexCoord;
-flat out int texLayer;
+uniform vec2 corner;
 
-uniform mat4 view;
-uniform mat4 projection;
-
-mat4 model = mat4(1.0);
+flat out int tex_index;
 
 void main() {
-    model[3] = vec4(aPos, 1.0);
-    gl_Position = projection * view * model * vec4(0.0, 0.0, 0.0, 1.0);
-    TexCoord = aTexCoord;
-    texLayer = int(blockType);
+
+    float n = gl_VertexID;
+    float x = floor(n / (256.0 * 16.0 * 6.0));
+    n = mod(n, 256.0 * 16.0 * 6.0);
+    float y = floor(n / (16.0 * 6.0));
+    n = mod(n, 16.0 * 6.0);
+    float z = floor(n / 6.0);
+    float f = mod(n, 6.0);
+    
+    gl_Position = vec4(x + corner.x * 16, y, z + corner.y * 16, f);
+    tex_index = blocktype;
+
 }
