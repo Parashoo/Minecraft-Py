@@ -145,5 +145,7 @@ def main():
     print("Render buffer creation: ", world_render.time_required)
     print(test_world.return_time())
 
+    print(ctx.info)
+
 if __name__ == '__main__':
     main()

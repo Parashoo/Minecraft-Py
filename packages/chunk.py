@@ -54,5 +54,8 @@ class chunk:
             neighbours = [self.data[tuple([x, y, z] + chunk.indices[i])] for i in range(6)]
             for index, item in enumerate(neighbours):
                 if item == 0: self.render_array[x, y, z, index] = blocktype
-        #print(self.render_array)
         return self
+    
+    def return_exposed_t(self, ctx):
+
+        dummy = ctx.buffer(reserve = 16 * 256 * 16)
