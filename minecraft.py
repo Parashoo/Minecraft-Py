@@ -47,6 +47,13 @@ with vertex_source_sky.open() as src:
 with fragment_source_sky.open() as src:
     fragment_source_sky = src.read()
 
+vertex_source_transform = shaderpath / "transform.vs"
+geometry_source_transform = shaderpath / "transform.gs"
+
+with vertex_source_transform.open() as src:
+    vertex_source_transform = src.read()
+with geometry_source_transform.open() as src:
+    geometry_source_transform = src.read()
 
 camera = utilities.camera((0, 16, 0), (0, 0, 0), (800, 600))
 
@@ -69,6 +76,7 @@ def main():
     scene = ctx.program(vertex_shader=vertex_source_3d, geometry_shader=geometry_source_3d, fragment_shader=fragment_source_3d)
     hud = ctx.program(vertex_shader=vertex_source_GUI, fragment_shader=fragment_source_GUI)
     sky = ctx.program(vertex_shader=vertex_source_sky, fragment_shader=fragment_source_sky)
+    transform = ctx.program(vertex_shader=vertex_source_transform, geometry_shader=geometry_source_transform)
 
     sky_data = np.array([     # Sky
         -1.0, 1.0, 0.0,
@@ -98,6 +106,8 @@ def main():
     world_render = render.render(layers, all_models, all_textures, scene, ctx)
     all_chunks = test_world.return_all_chunks()
     chunk_arrays = world_render.create_buffers_from_chunks(all_chunks) 
+
+    test = all_chunks[0].return_exposed_t(ctx, transform)
 
     while not window.check_if_closed():
 
@@ -144,8 +154,6 @@ def main():
     print("Average FPS: {}".format(np.mean(fps_list)))
     print("Render buffer creation: ", world_render.time_required)
     print(test_world.return_time())
-
-    print(ctx.info)
 
 if __name__ == '__main__':
     main()

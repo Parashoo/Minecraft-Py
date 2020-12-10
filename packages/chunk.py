@@ -12,6 +12,7 @@ class chunk:
             world = args[0]
             self.corner = args[1]
             self.data = world.return_chunk_data(self.corner)
+            print(self.data.dtype)
             self.data[:,:,16], self.data[:,:,17], self.data[16,:,:], self.data[17,:,:] = world.return_neighbour_slices(self.corner)
             self.GL_pointer = None
             self.render_array = np.zeros((16, 256, 16, 6), dtype = "int16")
@@ -56,6 +57,13 @@ class chunk:
                 if item == 0: self.render_array[x, y, z, index] = blocktype
         return self
     
-    def return_exposed_t(self, ctx):
+    def return_exposed_t(self, ctx, transform_program):
 
-        dummy = ctx.buffer(reserve = 16 * 256 * 16)
+        self.exposed_t = ctx.buffer(reserve = 16 * 256 * 16 * 6)
+
+        data_tex = ctx.texture3d((18, 64, 18), 1, self.data[:, :64, :].tobytes())        
+        transform_program['texture0'] = data_tex
+
+        dummy = ctx.buffer(reserve = 16 * 64 * 16)
+        dummy_vao = ctx.vertex_array(transform_program, [(dummy, 'i1 /v', 'dummy')])
+        dummy_vao.transform(self.exposed_t, mode=mgl.POINTS, vertices = 16 * 256 * 16)
