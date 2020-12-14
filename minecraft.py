@@ -76,7 +76,7 @@ def main():
     scene = ctx.program(vertex_shader=vertex_source_3d, geometry_shader=geometry_source_3d, fragment_shader=fragment_source_3d)
     hud = ctx.program(vertex_shader=vertex_source_GUI, fragment_shader=fragment_source_GUI)
     sky = ctx.program(vertex_shader=vertex_source_sky, fragment_shader=fragment_source_sky)
-    transform = ctx.program(vertex_shader=vertex_source_transform, geometry_shader=geometry_source_transform)
+    transform = ctx.program(vertex_shader=vertex_source_transform, geometry_shader=geometry_source_transform, varyings = 'type')
 
     sky_data = np.array([     # Sky
         -1.0, 1.0, 0.0,
@@ -105,9 +105,10 @@ def main():
 
     world_render = render.render(layers, all_models, all_textures, scene, ctx)
     all_chunks = test_world.return_all_chunks()
+    all_chunks[0].return_exposed_t(ctx, transform)
     chunk_arrays = world_render.create_buffers_from_chunks(all_chunks) 
 
-    test = all_chunks[0].return_exposed_t(ctx, transform)
+    all_chunks[0].return_exposed_t(ctx, transform)
 
     while not window.check_if_closed():
 

@@ -76,7 +76,6 @@ class world:
         self.chunk_pointer_dict = {}
         self.chunk_list = []
         for index, chunk_info in enumerate(self.chunk_dict.items()):
-            print(chunk_info[0])
             self.chunk_list.append(chunk.chunk(self, eval(chunk_info[0])).return_exposed())
             self.chunk_pointer_dict[eval(chunk_info[0])] = index
         self.time_required.append(time() - now)
