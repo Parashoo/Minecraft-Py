@@ -61,8 +61,8 @@ class chunk:
     def return_exposed_t(self, ctx, transform_program):
 
         self.exposed_t = ctx.buffer(reserve = 16 * 64 * 16 * 6)
-        data_tex = ctx.texture3d((18, 64, 18), 1, np.ones((18, 64, 18), dtype = 'uint8').tobytes(), dtype = 'u1')
-        transform_program['texture0'] = 0
+        data_tex = ctx.texture3d((18, 64, 18), 1, np.full((18, 64, 18), 255, dtype = 'uint8').tobytes(), dtype = 'u1')
+        transform_program['chunk_data'] = 0
         data_tex.use(location=0)
 
         dummy = ctx.buffer(reserve = 16 * 64 * 16)
@@ -71,5 +71,7 @@ class chunk:
 
         transform_data = np.frombuffer(self.exposed_t.read(), dtype = 'uint8').reshape(16, 64, 16, 6)
 
-        self.render_array[:, :64, :] = transform_data
+        print(transform_data)
+
+        #self.render_array[:, :64, :] = transform_data
         
