@@ -4,7 +4,6 @@ import glm
 import time
 import sys, os
 
-from OpenGL.GL import *
 from PIL import Image
 from pathlib import Path
 

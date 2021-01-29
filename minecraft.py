@@ -10,7 +10,6 @@ import glfw
 import glm
 import numpy as np
 import moderngl as mgl
-from OpenGL.GL import *
 from math import sin, cos
 from PIL import Image
 from packages import utilities, chunk, render, world_gen, model
