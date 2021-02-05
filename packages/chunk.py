@@ -61,15 +61,15 @@ class chunk:
     def return_exposed_t(self, ctx, transform_program):
 
         self.exposed_t = ctx.buffer(reserve = 16 * 64 * 16 * 6)
-        data_tex = ctx.texture3d((18, 64, 18), 1, np.full((18, 64, 18), 255, dtype = 'uint8').tobytes(), dtype = 'u1')
+        data_tex = ctx.texture3d((18, 66, 18), 1, data=np.full((18, 66, 18), 255, dtype = 'f4'), dtype = 'f4')
         transform_program['chunk_data'] = 0
         data_tex.use(location=0)
 
-        dummy = ctx.buffer(reserve = 16 * 64 * 16)
+        dummy = ctx.buffer(reserve = 16 * 64 * 16 * 6)
         dummy_vao = ctx.vertex_array(transform_program, [])
-        dummy_vao.transform(self.exposed_t, mode=mgl.POINTS, vertices = 16 * 256 * 16)
+        dummy_vao.transform(self.exposed_t, mode=mgl.POINTS, vertices = 16 * 64 * 16 * 6)
 
-        transform_data = np.frombuffer(self.exposed_t.read(), dtype = 'uint8').reshape(16, 64, 16, 6)
+        transform_data = np.frombuffer(self.exposed_t.read(), dtype = 'f4').reshape((16, 64, 16, 6))
 
         print(transform_data)
 

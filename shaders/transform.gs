@@ -5,7 +5,7 @@ layout (points, max_vertices = 6) out;
 
 uniform sampler3D chunk_data;
 
-out uint type;
+out float type;
 
 void main() {
 
@@ -24,15 +24,16 @@ void main() {
     for (int i=0;i<6;i++){
 
     if (neighbours[i] == 0) {
-    type = uint(1);
+    type = float(1);
     } else {
-    type = uint(0);
+    type = float(0);
     }
 
-    type = uint(blocktype);
+    type = 255.0;
     EmitVertex();
-    EndPrimitive();
     }
+
+    EndPrimitive();
 
     }
 

@@ -10,7 +10,7 @@ def setup():
         transform_geo = src.read()
 
     prog = ctx.program(vertex_shader=transform_vert, geometry_shader = transform_geo, varyings = 'type')
-    data_tex = ctx.texture3D((16, 16, 16), 1, data=np.reshape(np.array(np.arange(0, 256, 256 / 4096), dtype = 'f4'), (16, 16, 16)), dtype = 'f4')
+    data_tex = ctx.texture3d((16, 16, 16), 1, data=np.full((16, 16, 16), 150, dtype='f4'), dtype = 'f4')
 
     return ctx, prog, data_tex
 

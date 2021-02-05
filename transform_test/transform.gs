@@ -12,7 +12,7 @@ void main() {
     uint x = uint(gl_in[0].gl_Position.x - int(gl_in[0].gl_Position.x/16)*16);
     uint y = uint(gl_in[0].gl_Position.x/16);
 
-    type = uint(texelFetch(data, ivec3(x, y, 256), 0).x);
+    type = uint(texelFetch(data, ivec3(5, 5, 5), 0).x);
 
     EmitVertex();
     EndPrimitive();
