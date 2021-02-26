@@ -29,7 +29,7 @@ void main() {
     type = float(0);
     }
 
-    type = 255.0;
+    type = float(blocktype);
     EmitVertex();
     }
 

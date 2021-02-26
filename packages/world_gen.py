@@ -54,7 +54,7 @@ class world:
         self.time_required = [elapsed]
         
     def return_chunk_data(self, corner):
-        return np.fromstring(bytes(self.world_lines[self.chunk_dict[str(corner)]][:-1], 'utf-8'), dtype='uint8').reshape(18, 257, 18)
+        return np.fromstring(bytes(self.world_lines[self.chunk_dict[str(corner)]][:-1], 'utf-8'), dtype='uint8').reshape(18, 64, 18)
        
     def return_neighbour_slices(self, corner):
         neighbour_corners = [((corner[0], corner[1] + 1), (slice(None), slice(None), 0)),
@@ -66,7 +66,7 @@ class world:
             if str(neighbour_corner[0]) in self.chunk_dict.keys():
                 neighbour_slices.append(self.return_chunk_data(neighbour_corner[0])[neighbour_corner[1]])
             else:
-                neighbour_slices.append(np.zeros((18, 257, 18), dtype = "uint8")[neighbour_corner[1]])
+                neighbour_slices.append(np.zeros((18, 64, 18), dtype = "uint8")[neighbour_corner[1]])
         return neighbour_slices
 
     def return_all_chunks(self):

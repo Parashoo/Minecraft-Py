@@ -109,45 +109,45 @@ def main():
 
     all_chunks[0].return_exposed_t(ctx, transform)
 
-    while not window.check_if_closed():
+    # while not window.check_if_closed():
 
-        current_frame = glfw.get_time()
-        delta_time = current_frame - last_frame
-        last_frame = current_frame
-        second_counter += delta_time
-        frame_counter += 1
+    #     current_frame = glfw.get_time()
+    #     delta_time = current_frame - last_frame
+    #     last_frame = current_frame
+    #     second_counter += delta_time
+    #     frame_counter += 1
 
-        window.refresh(0, ctx)
+    #     window.refresh(0, ctx)
 
-        sky['orientation'] = glm.radians(camera.pitch)
-        ctx.disable(mgl.DEPTH_TEST)
-        sky_vao.render(mode=mgl.TRIANGLE_STRIP)
+    #     sky['orientation'] = glm.radians(camera.pitch)
+    #     ctx.disable(mgl.DEPTH_TEST)
+    #     sky_vao.render(mode=mgl.TRIANGLE_STRIP)
 
-        camera.process_input(window, delta_time)
-        camera.testing_commands(window)
+    #     camera.process_input(window, delta_time)
+    #     camera.testing_commands(window)
 
-        pos, looking, up = camera.return_vectors()
-        view = glm.lookAt(pos, looking, up)
-        projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
-        scene['view'].write(view)
-        scene['projection'].write(projection)
-        scene['texture0'] = 0
+    #     pos, looking, up = camera.return_vectors()
+    #     view = glm.lookAt(pos, looking, up)
+    #     projection = glm.perspective(glm.radians(45), window.size[0]/window.size[1], 0.1, 256)
+    #     scene['view'].write(view)
+    #     scene['projection'].write(projection)
+    #     scene['texture0'] = 0
 
-        all_textures.use(location=0)
+    #     all_textures.use(location=0)
         
-        if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
-            test_world.set_block(tuple(glm.ivec3(pos)), 3, world_render)
-        ctx.enable(mgl.DEPTH_TEST)
-        world_render.draw_from_chunks(chunk_arrays)
+    #     if glfw.get_key(window.window, glfw.KEY_U) == glfw.PRESS:
+    #         test_world.set_block(tuple(glm.ivec3(pos)), 3, world_render)
+    #     ctx.enable(mgl.DEPTH_TEST)
+    #     world_render.draw_from_chunks(chunk_arrays)
 
-        hud['texture0'] = 0
-        crosshair_texture.use(location=0)
-        vao_2d.render(mode=mgl.POINTS)
+    #     hud['texture0'] = 0
+    #     crosshair_texture.use(location=0)
+    #     vao_2d.render(mode=mgl.POINTS)
 
-        if second_counter >= 1:
-            fps_list.append(frame_counter)
-            second_counter, frame_counter = 0, 0
-        window.refresh(1, ctx)
+    #     if second_counter >= 1:
+    #         fps_list.append(frame_counter)
+    #         second_counter, frame_counter = 0, 0
+    #     window.refresh(1, ctx)
 
     window.close()
     print('\n===== End statistics =====')
