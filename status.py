@@ -1,6 +1,6 @@
 import sys
 
-class stm:
+class status_message:
     def __init__(self, msg):
         self.msg = msg
         self.start()
