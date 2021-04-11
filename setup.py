@@ -1,4 +1,5 @@
 import moderngl as mgl
+import numpy as np
 import glfw
 import status
 
@@ -72,7 +73,9 @@ class program:
         self.program = context.program(vertex_shader = shaders_code['vert'], fragment_shader = shaders_code['frag'], geometry_shader = shaders_code['geo'])
         self.context = context
 
-    def load_textures(self):
+    def load_texture_array(self):
+        """Loads all textures in the 'Minecraft-Py/textures' into an array texture."""
+
         texture_path = Path() / 'textures'
         texture_data_list = []
         for texture in texture_path.iterdir():
@@ -81,6 +84,9 @@ class program:
         self.texture_array = self.context.texture_array((16, 16, len(texture_array_data)), 4, texture_array_data)
         self.texture_array.build_mipmaps()
         self.texture_array.filter = (mgl.LINEAR_MIPMAP_NEAREST, mgl.NEAREST)
+
+    def use_texture_array(self, location = 0):
+        self.texture_array.use(location)
 
 
 def resize_callback(ctx, width, height): # Changes rendering viewport on window resize
