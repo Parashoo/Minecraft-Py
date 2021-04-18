@@ -74,6 +74,7 @@ class camera:
         camera_speed = [4.13 * delta_time, 5 * delta_time]
         sprint_speed = camera_speed[0]
         self.feet_pos = self.pos - glm.vec3(0, 2, 0)
+        in_chunk = world.return_chunk_containing_block((self.pos.x, self.pos.y, self.pos.z))
         if self.sprint:
             sprint_speed = 10 * delta_time
         if glfw.get_key(parent.window, glfw.KEY_W) == glfw.PRESS:
