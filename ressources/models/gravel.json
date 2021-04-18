@@ -1,0 +1,14 @@
+{
+  "blockid": "gravel",
+  "blocknum": 6,
+  "textures":
+  {
+    "top": "gravel.png",
+    "bottom": "gravel.png",
+    "north": "gravel.png",
+    "south": "gravel.png",
+    "east": "gravel.png",
+    "west": "gravel.png"
+  },
+  "opaque": true
+}

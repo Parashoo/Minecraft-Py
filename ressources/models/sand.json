@@ -1,0 +1,14 @@
+{
+  "blockid": "sand",
+  "blocknum": 7,
+  "textures":
+  {
+    "top": "sand.png",
+    "bottom": "sand.png",
+    "north": "sand.png",
+    "south": "sand.png",
+    "east": "sand.png",
+    "west": "sand.png"
+  },
+  "opaque": true
+}

@@ -1,0 +1,14 @@
+{
+  "blockid": "bricks",
+  "blocknum": 4,
+  "textures":
+  {
+    "top": "bricks.png",
+    "bottom": "bricks.png",
+    "north": "bricks.png",
+    "south": "bricks.png",
+    "east": "bricks.png",
+    "west": "bricks.png"
+  },
+  "opaque": true
+}

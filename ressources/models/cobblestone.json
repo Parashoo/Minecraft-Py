@@ -1,0 +1,13 @@
+{
+  "blockid": "cobblestone",
+  "blocknum": 5,
+  "textures": {
+    "top": "cobblestone.png",
+    "bottom": "cobblestone.png",
+    "north": "cobblestone.png",
+    "south": "cobblestone.png",
+    "east": "cobblestone.png",
+    "west": "cobblestone.png"
+  },
+  "opaque": true
+}

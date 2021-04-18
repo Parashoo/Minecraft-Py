@@ -1,0 +1,14 @@
+{
+  "blockid": "grass",
+  "blocknum": 3,
+  "textures":
+  {
+    "top": "grass_block_top.png",
+    "bottom": "dirt.png",
+    "north": "grass_block_side.png",
+    "south": "grass_block_side.png",
+    "east": "grass_block_side.png",
+    "west": "grass_block_side.png"
+  },
+  "opaque": true
+}
