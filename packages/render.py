@@ -158,7 +158,7 @@ class render:
 
     def draw_from_chunks(self, chunk_list):
         for index, chunk in enumerate(chunk_list):
-            chunk.vao.render(mode = mgl.TRIANGLES, vertices = int(self.vbo_list[index].size / 24))
+            chunk.vao.render(mode = mgl.TRIANGLES, vertices = 6 * 6 * 16 * 16 * 16 * 20)
 
 def load_all_block_textures(sourcepath, context):
     layer_list = {}

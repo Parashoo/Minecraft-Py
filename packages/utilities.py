@@ -20,8 +20,10 @@ class camera:
         self.sprint_press = 0
         self.coords_toggle = False
 
+
+        self.asdf = True
         self.v_y = glm.vec3(0.0)
-        self.feet_pos = self.pos - glm.vec3(0, 2, 0)
+        self.feet = self.pos - glm.vec3(0, 2, 0)
 
         self.last_x, self.last_y = window_size[0]/2, window_size[1]/2
         self.pitch = glm.asin(self.front.y)
@@ -73,8 +75,26 @@ class camera:
     def process_input(self, parent, delta_time, world):
         camera_speed = [4.13 * delta_time, 5 * delta_time]
         sprint_speed = camera_speed[0]
-        self.feet_pos = self.pos - glm.vec3(0, 2, 0)
+        self.feet = self.pos - glm.vec3(0, 2, 0)
         in_chunk = world.return_chunk_containing_block((self.pos.x, self.pos.y, self.pos.z))
+        chunk_pos = glm.ivec3(self.pos.x % 16, self.pos.y, self.pos.z % 16)
+
+        pos_before = glm.ivec3(self.pos.x, self.pos.y, self.pos.z)
+
+        blocks_to_check = [glm.ivec3( 0, -1,  0),
+                           glm.ivec3(-1,  0,  0),
+                           glm.ivec3( 1,  0,  0),
+                           glm.ivec3( 0,  0, -1),
+                           glm.ivec3( 0,  0,  1),
+                           glm.ivec3( 0,  1,  0)] 
+        
+        actions_to_take = [0.25,
+                           0.25,
+                           0.75,
+                           0.25,
+                           0.75,
+                           0.75]
+
         if self.sprint:
             sprint_speed = 10 * delta_time
         if glfw.get_key(parent.window, glfw.KEY_W) == glfw.PRESS:
@@ -94,18 +114,30 @@ class camera:
             self.pos -= self.up * camera_speed[1]
         if glfw.get_key(parent.window, glfw.KEY_LEFT_CONTROL) == glfw.PRESS:
             self.sprint = True
-
-        self.feet_pos, self.pos = self.feet_pos + (self.v_y * delta_time), self.pos + (self.v_y * delta_time)
+        self.feet, self.pos = self.feet + (self.v_y * delta_time), self.pos + (self.v_y * delta_time)
         try:
-            in_block = in_chunk.data[int(self.feet_pos.x % 16), int(self.feet_pos.y), int(self.feet_pos.z % 16)]
+            in_block = in_chunk.data[int(self.feet.x % 16), int(self.feet.y), int(self.feet.z % 16)]
         except IndexError:
             in_block = 0
         if in_block == 0:
             self.v_y.y -= 28 * delta_time
         else:
-            self.feet_pos, self.pos = glm.vec3(round(self.feet_pos.x), self.feet_pos.y, round(self.feet_pos.z)), glm.vec3(round(self.pos.x), self.pos.y, round(self.feet_pos.z))
             self.v_y.y = 0
-            self.feet_pos.y, self.pos.y = int(self.feet_pos.y) + 1, int(self.pos.y) + 1
+            self.feet.y, self.pos.y = chunk_pos.y, chunk_pos.y
+            in_block = in_chunk.data[int(self.feet.x % 16), int(self.feet.y), int(self.feet.z % 16)]
+
+        # if in_chunk.data[pos_before.x + 1, pos_before.y, pos_before.z] != 0 and self.pos.x >= pos_before.x + 0.75:
+            # self.pos.x = pos_before.x + 0.75
+            # print(1)
+        # if in_chunk.data[pos_before.x - 1, pos_before.y, pos_before.z] != 0 and self.pos.x <= pos_before.x:
+            # self.pos.x = pos_before.x + 0.25
+            # print(2)
+        # if in_chunk.data[pos_before.x, pos_before.y, pos_before.z + 1] != 0 and self.pos.z >= pos_before.z + 0.75:
+            # self.pos.z = pos_before.z + 0.75
+            # print(3)
+        # if in_chunk.data[pos_before.x, pos_before.y, pos_before.z - 1] != 0 and self.pos.z <= pos_before.z:
+            # print(4)
+            # self.pos.z = pos_before.z + 0.25
 
     def testing_commands(self, parent):
         if glfw.get_key(parent.window, glfw.KEY_H) == glfw.PRESS:
